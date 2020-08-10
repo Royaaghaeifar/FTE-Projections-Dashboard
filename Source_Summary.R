@@ -8,7 +8,7 @@ Source_Summary <- function(data){
   
   setwd(dir)
   #Read paycode mapping file and Pay cycle file
-  System_Paycode <- read_xlsx("Reference Tables/All Sites Pay Code Mappings .xlsx")
+  System_Paycode <- read_xlsx("Reference Tables/All Sites Pay Code Mappings.xlsx")
   colnames(System_Paycode) <- c("PAY.CODE","PAY.CODE.NAME","PAY.CODE.MAPPING","INCLUDE.HOURS","INCLUDE.EXPENSES","JODI","JODI.NO.PTO")
   System_Paycode <- System_Paycode %>%
     mutate(PAY.CODE = str_trim(PAY.CODE)) 
@@ -39,8 +39,8 @@ Source_Summary <- function(data){
   
   #Bring in paycode mapping and hours included columns
   Site_Summary <- left_join(Summary,System_Paycode) %>%
-    select(c(1:10),16,17,19,c(11:13))
+    select(c(1:10),c(15:17),c(11:13))
   Site_Summary <- Site_Summary %>% distinct()
-  #colnames(Site_Summary)[11:12] <- c("PAYCODE.MAPPING","HOURS.INCLUDE")
+  
   return(Site_Summary)
 }
