@@ -40,6 +40,12 @@ Source_Summary <- function(data){
   #Bring in paycode mapping and hours included columns
   Site_Summary <- left_join(Summary,System_Paycode) %>%
     select(c(1:10),c(15:17),c(11:13))
+  
+  #Bring in Provider Column
+  System_Jobcode <- read_xlsx("Reference Tables/All Sites Job Code Mappings.xlsx")
+  Site_Summary <- left_join(Site_Summary,System_Jobcode, by = c("PAYROLL"="PAYROLL", "J.C"="J.C")) %>%
+    select(c(1:16,18))
+  
   Site_Summary <- Site_Summary %>% distinct()
   
   return(Site_Summary)
