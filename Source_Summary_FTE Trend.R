@@ -48,7 +48,7 @@ Source_Summary <- function(data){
   
   #Bring in cost center mappings
   System_Department <- read_xlsx("Reference Tables/All Sites Cost Center Mappings.xlsx")
-  check <- left_join(Site_Summary,System_Department, by = c("DPT.WRKD" = "COST.CENTER"))
+  Site_Summary <- left_join(Site_Summary,System_Department, by = c("DPT.WRKD" = "COST.CENTER"))
   
   Site_Summary <- Site_Summary %>% distinct()
   
