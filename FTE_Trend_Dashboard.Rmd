@@ -1,0 +1,27 @@
+---
+title: MSHS FTE Dashboard
+author: Health System Operations
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r,echo=F,warning=F,message=F}
+source("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Scripts/Dashboard_Functions.R")
+```
+
+## Mount Sinai Health System {.tabset}
+
+### MSHS
+```{r, echo=F,warning=F,message=F,fig.width=12}
+system_premier()
+system_no_premier()
+```
+
+### MSH
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp="MSH",service="Perioperative Services")
+```
+
+### MSQ
+
+### MSBI
