@@ -5,10 +5,10 @@
 library(dplyr)
 library(readxl)
 
-dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-dir_ref <- paste0(dir, "MSBIB Reference/")
+#dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
+dir_ref <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/MSBIB Reference/"
 
-data_MSBI_MSB <- readRDS(paste0(dir, "Reference Tables/data_MSBI_MSB.rds"))
+data_MSBI_MSB <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/data_MSBI_MSB.rds")
 
 # Inputs/Imports ----------------------------------------------------------
 
