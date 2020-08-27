@@ -27,9 +27,9 @@ oracle <- oracle %>%
 
 #Bring in department location
 oracle <- left_join(oracle,COA, by = c("Reverse.Map.for.Worked" = "Column2")) %>%
-  select(1:34)
-oracle <- left_join(oracle,COA, by = c("Reverse.Map.for.Home" = "Column2")) %>%
   select(1:35)
+oracle <- left_join(oracle,COA, by = c("Reverse.Map.for.Home" = "Column2")) %>%
+  select(1:36)
 
 #Bring in standardized JC Description
 oracle <- left_join(oracle,JCdesc, by = c("Job.Code" = "J.C"))
@@ -40,10 +40,10 @@ oracle <- oracle %>%
          Hours = as.numeric(Hours),
          Expense = as.numeric(Expense))
 #Column names
-colnames(oracle)[c(6,7,12:17,31,32,34:36)] = c("START.DATE","END.DATE","J.C","PAY.CODE","HOURS","EXPENSE",
+colnames(oracle)[c(6,7,12:17,31,32,35:37)] = c("START.DATE","END.DATE","J.C","PAY.CODE","HOURS","EXPENSE",
                                                "HOME.DESCRIPTION","WRKD.DESCRIPTION","DPT.WRKD","DPT.HOME",
                                                "WRKD.LOCATION","HOME.LOCATION","J.C.DESCRIPTION")
 #Only take necessary columns
-data_MSH_MSQ_oracle <- select(oracle,c(6,7,12:17,31,32,33,34:36))
+data_MSH_MSQ_oracle <- select(oracle,c(6,7,12:17,31,32,34,35:37))
 
 rm(Blank,COA,JCdesc,oracle)
