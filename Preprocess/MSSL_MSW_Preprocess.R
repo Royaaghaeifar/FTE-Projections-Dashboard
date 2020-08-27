@@ -1,12 +1,12 @@
 #dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement"
-setwd(dir)
+#setwd(dir)
 
 # Load Libriaries ---------------------------------------------------------
 library(readxl)
 library(tidyverse)
 
 # Import Data -------------------------------------------------------------
-data_MSSL_MSW <- readRDS(paste0(dir,"/MSLW RAW/Data_MSSL_MSW.rds"))
+data_MSSL_MSW <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/MSLW RAW/Data_MSSL_MSW.rds")
 
 ## Preprocess Data ------------------------------------------------------
 #data_MSSL_MSW <- data_MSSL_MSW %>% mutate(`START DATE` = paste0(substr(`START DATE`,1,2), "/", substr(`START DATE`,3,4), "/",substr(`START DATE`,5,8)),
@@ -15,7 +15,7 @@ data_MSSL_MSW <- readRDS(paste0(dir,"/MSLW RAW/Data_MSSL_MSW.rds"))
 #                                          `END DATE` = as.Date(`END DATE`, "%m/%d/%Y"))
 
 # Import References -------------------------------------------------------
-folder_references <- paste0(dir,"/MSLW Reference Tables")
+folder_references <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/MSLW Reference Tables"
 dict_paycycle_alt <- read_xlsx(paste0(folder_references, "/Dictionary_Alt Pay Cycles.xlsx"))
 dict_jobcodes <- read_xlsx(paste0(folder_references, "/MSLW Job Codes.xlsx"))
 dict_COFTloc <- read_xlsx(paste0(folder_references, "/Dictionary_COFT.xlsx")) #this will be from matts excel file
@@ -77,4 +77,4 @@ data_MSSL_MSW <- data_MSSL_MSW %>%
          PAY.CODE = as.character(PAY.CODE))
 
 # Clear Environment -------------------------------------------------------
-rm(folder_references, dict_COFTloc, dict_jobcodes, dict_paycycle_alt, dict_site, format_biweekly_paycycle)
+rm(folder_references, dict_COFTloc, dict_jobcodes, dict_paycycle_alt, dict_site)
