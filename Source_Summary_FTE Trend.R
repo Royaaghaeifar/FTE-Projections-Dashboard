@@ -1,14 +1,12 @@
 Source_Func <- function(x){
   source(paste0(getwd(),"/Preprocess/",x))
-  #setwd(paste0(dir,"Preprocess/"))
+  setwd(dir)
 }
 
 Source_Summary <- function(data){
   library(readxl)
-  dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-  setwd(dir)
   #Read paycode mapping file and Pay cycle file
-  System_Paycode <- read_xlsx("Reference Tables/All Sites Pay Code Mappings.xlsx")
+  System_Paycode <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/All Sites Pay Code Mappings.xlsx")
   colnames(System_Paycode) <- c("PAY.CODE","PAY.CODE.NAME","PAY.CODE.MAPPING","INCLUDE.HOURS","INCLUDE.EXPENSES","JODI","JODI.NO.PTO")
   System_Paycode <- System_Paycode %>%
     mutate(PAY.CODE = str_trim(PAY.CODE)) 
@@ -19,7 +17,7 @@ Source_Summary <- function(data){
   }
   
   #Read in paycycle
-  PayCycle <- read.csv("Reference Tables/PayCycle.csv", header = T, stringsAsFactors = F)
+  PayCycle <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/PayCycle.csv", header = T, stringsAsFactors = F)
   PayCycle <- PayCycle %>%
     mutate(Date.1 = as.Date(Date.1, format = "%m/%d/%Y")) %>%
     mutate(Start.Date = as.Date(Start.Date, format = "%m/%d/%Y")) %>%
@@ -42,12 +40,12 @@ Source_Summary <- function(data){
     select(c(1:10),c(15:17),c(11:13))
   
   #Bring in Provider Column
-  System_Jobcode <- read_xlsx("Reference Tables/All Sites Job Code Mappings.xlsx")
+  System_Jobcode <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/All Sites Job Code Mappings.xlsx")
   Site_Summary <- left_join(Site_Summary,System_Jobcode, by = c("PAYROLL"="PAYROLL", "J.C"="J.C")) %>%
     select(c(1:16,18))
   
   #Bring in cost center mappings
-  System_Department <- read_xlsx("Reference Tables/All Sites Cost Center Mappings.xlsx")
+  System_Department <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/All Sites Cost Center Mappings.xlsx")
   Site_Summary <- left_join(Site_Summary,System_Department, by = c("DPT.WRKD" = "COST.CENTER"))
   
   Site_Summary <- Site_Summary %>% distinct()
