@@ -1,11 +1,11 @@
 Source_Func <- function(x){
-  source(x)
-  setwd(paste0(dir,"Preprocess/"))
+  source(paste0(getwd(),"/Preprocess/",x))
+  #setwd(paste0(dir,"Preprocess/"))
 }
 
 Source_Summary <- function(data){
   library(readxl)
-  
+  dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
   setwd(dir)
   #Read paycode mapping file and Pay cycle file
   System_Paycode <- read_xlsx("Reference Tables/All Sites Pay Code Mappings.xlsx")
