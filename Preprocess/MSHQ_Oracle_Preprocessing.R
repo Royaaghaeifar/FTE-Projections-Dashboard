@@ -1,14 +1,12 @@
 library(dplyr)
 
-dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-setwd(dir)
-data_MSH_MSQ_oracle <- readRDS("Reference Tables/data_MSH_MSQ_oracle.rds")
+data_MSH_MSQ_oracle <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/data_MSH_MSQ_oracle.rds")
 
 #Read COA for department location
-COA <- read.csv("Reference Tables/COA.csv",header = T, stringsAsFactors = F)
+COA <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",header = T, stringsAsFactors = F)
 
 #Read in job code descriptions
-JCdesc <- read.csv("Reference Tables/JCdesc.csv",header = T, stringsAsFactors = F)
+JCdesc <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/JCdesc.csv",header = T, stringsAsFactors = F)
 
 #Remove NA worked department
 oracle <- data_MSH_MSQ_oracle %>%
