@@ -76,6 +76,7 @@ service_line <- function(hosp,service, startdate = as.Date("12/22/2019",format="
   data <- System_Summary %>%
     filter(PP.END.DATE < as.Date("3/1/2020",format="%m/%d/%Y") |
            PP.END.DATE >as.Date("5/9/2020",format="%m/%d/%Y"),
+           PAYROLL == hosp,
            PROVIDER == 0,
            INCLUDE.HOURS == 1,
            SERVICE.LINE == service,
@@ -85,21 +86,21 @@ service_line <- function(hosp,service, startdate = as.Date("12/22/2019",format="
     mutate(DEPARTMENT = paste(DEFINITION.CODE,"-",toupper(DEFINITION.NAME)),
            DATES = as.character(PP.END.DATE))
   data$DATES <- factor(data$DATES)
-  y <- round(max(data$FTE),-2)
   service_line_graph <- ggplot(data = data, aes(x=DATES,y=FTE,group=DEPARTMENT,color=DEPARTMENT))+
     geom_line(size=1.5)+
     geom_point(size=2.75)+
     ggtitle(paste(hosp,service,"FTE's By Pay Period"))+
     xlab("Pay Period")+
     ylab("FTE (Full Time Equivalent)")+
-    scale_y_continuous(breaks = seq(0,y,y/10))+
+    #scale_y_continuous(breaks = seq(0,y,y/10))+
     #scale_color_manual(values=MountSinai_pal("main")(7))+
     theme(plot.title=element_text(hjust=.5,size=20),
           axis.title = element_text(face="bold"),
           legend.text=element_text(size = 6))
   service_line_graphly <- ggplotly(service_line_graph,
          tooltip=c("group","x","y")) %>%
-  layout(legend = list(orientation = "h",y=-.2,xanchor = "bottom"))
+  layout(#legend = list(orientation = "h",y=-.2,xanchor = "bottom")
+    title = list(xanchor = "center"))
   return(service_line_graphly)
 }
 
@@ -155,22 +156,58 @@ system_no_premier <- function(){
   return(system_premier_graph)
 }
 
+#Kable
+k <- function(hosp,startdate = as.Date("12/22/2019",format="%m/%d/%Y")){
+  library(tidyr)
+  data <- System_Summary %>%
+    filter(PP.END.DATE < as.Date("3/1/2020",format="%m/%d/%Y") |
+           PP.END.DATE >as.Date("5/9/2020",format="%m/%d/%Y"),
+           PAYROLL == hosp,
+           PROVIDER == 0,
+           INCLUDE.HOURS == 1,
+           !is.na(SERVICE.LINE),
+           PAY.CODE.MAPPING %in% worked) %>%
+    group_by(SERVICE.LINE,DEFINITION.CODE,DEFINITION.NAME,PP.END.DATE) %>%
+    summarise(FTE = round(sum(HOURS, na.rm = T)/75,2)) %>%
+    mutate(DEPARTMENT = paste(DEFINITION.CODE,"-",toupper(DEFINITION.NAME)),
+           DATES = as.character(PP.END.DATE)) %>%
+    pivot_wider(id_cols = c(SERVICE.LINE,DEPARTMENT),names_from = DATES,values_from = FTE)
+  colnames(data)[1] <- "Service Line"
+  Ktable <<- data
+}
+
 ```
 
 ## Mount Sinai Health System {.tabset}
 
 ### MSHS
-```{r, echo=F,warning=F,message=F,fig.width=12}
-system_premier()
-system_no_premier()
+```{r, echo=F,warning=F,message=F,fig.width=15}
+#system_premier()
+#system_no_premier()
 ```
 
 ### MSH
-```{r, echo=F,warning=F,message=F,fig.width=9}
-hospital <- "MSH"
-lapply(service_list,function(x)service_line(hosp=hospital,service=x))
+```{r, echo=F,warning=F,message=F,fig.width=12}
+#lapply(service_list,function(x)service_line(hosp="MSH",service=x))
+service_line(hosp = "MSH",service = "Perioperative Services")
+service_line(hosp = "MSH",service = "Radiology")
+service_line(hosp = "MSH",service = "Support Services")
+service_line(hosp = "MSH",service = "Nursing")
+service_line(hosp = "MSH",service = "Emergency Department")
 ```
 
+```{r, echo=F,warning=F,message=F,fig.width=15}
+library(knitr)
+library(kableExtra)
+k(hosp = "MSH")
+kable(Ktable) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Ktable), color = "black") %>%
+  row_spec(0:nrow(Ktable), align = "c") %>%
+  column_spec(1,bold = T) %>%
+  collapse_rows(1)
+```
 ### MSQ
 
 ### MSBI
