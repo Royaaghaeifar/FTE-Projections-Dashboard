@@ -1,4 +1,7 @@
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
 ##Reload Master##########################################################################
 setwd("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary")
 System_Summary <- readRDS("System_Summary.rds")
@@ -64,7 +67,7 @@ worked <- c("REGULAR","OVERTIME","OTHER_WORKED")
 service_line <- function(hosp,service, startdate = as.Date("12/22/2019",format="%m/%d/%Y")){
   data <- System_Summary %>%
     filter(PP.END.DATE < as.Date("3/1/2020",format="%m/%d/%Y") |
-           PP.END.DATE >as.Date("5/9/2020",format="%m/%d/%Y"),
+             PP.END.DATE >as.Date("5/9/2020",format="%m/%d/%Y"),
            PROVIDER == 0,
            INCLUDE.HOURS == 1,
            SERVICE.LINE == service,
