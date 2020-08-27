@@ -15,7 +15,7 @@ data_MSH_MSQ <- left_join(data_MSH_MSQ,JCdesc)
 
 #bring in department description and Location
 data_MSH_MSQ <- left_join(data_MSH_MSQ,COA,by = c("DPT.WRKD" = "Column2")) %>%
-  select(c(1:17,19:22),)
+  select(1:21)
 colnames(data_MSH_MSQ)[20:21] <- c("LOCATION","DESCRIPTION")
 
 #Correct negative hours and expenses
