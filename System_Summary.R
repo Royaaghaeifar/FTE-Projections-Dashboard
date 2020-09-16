@@ -14,11 +14,9 @@ System_Summary_List <- lapply(System_Preprocess, function(x)Source_Summary(x))
 #bind all summary tables into system summary
 System_Summary = do.call("rbind",System_Summary_List)
 #Save System Summary table
-setwd("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary")
-saveRDS(System_Summary,file = "System_Summary.rds")
+saveRDS(System_Summary,file = "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary/System_Summary.rds")
 #########################################################################################
 
 ##Reload Master##########################################################################
-setwd("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary")
-System_Summary <- readRDS("System_Summary.rds")
+System_Summary <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary/System_Summary.rds")
 #########################################################################################
