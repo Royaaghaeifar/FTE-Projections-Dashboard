@@ -9,145 +9,199 @@ output:
     toc_float: true
 ---
 
+<style type="text/css">
+div.main-container {
+  max-width: 1780px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
 ```{r, echo=F,warning=F,message=F,results='hide'}
-library(dplyr)
-library(ggplot2)
-library(plotly)
-
-##Reload Master##########################################################################
-System_Summary <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary/System_Summary.rds")
-System_Summary <- System_Summary %>%
-  filter(PP.END.DATE >= as.Date("12/22/2019",format="%m/%d/%Y"))
-#########################################################################################
-
-#Worked hour pay code mappings
-worked <- c("REGULAR","OVERTIME","OTHER_WORKED")
-#Site Based Service List
-MSH_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-MSQ_service_list <- list("ICU","Med/Surg","Perioperative Services","Support Services","Pharmacy","Radiology","Emergency Department")
-MSBI_service_list <- list("ICU","Progressive","Med/Surg","Psych","RETU","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-MSB_service_list <- list("ICU","Progressive","Med/Surg","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-MSW_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-MSM_service_list <- list("ICU","Progressive","Med/Surg","Psych","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-site_list <- list("MSH","MSQ","MSBI","MSB","MSW","MSM")
-
-#Pre filter data 
-data <- System_Summary %>%
-  filter(PP.END.DATE < as.Date("3/1/2020",format="%m/%d/%Y") | #date must be earlier than 3/1/2020
-         PP.END.DATE >as.Date("5/9/2020",format="%m/%d/%Y"),   #or greater than 5/9/2020
-         PROVIDER == 0, #remove providers
-         INCLUDE.HOURS == 1, #only use included hour paycodes
-         PAY.CODE.MAPPING %in% worked) %>% #remove unproductive paycodes 
-  group_by(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,SERVICE.LINE,PP.END.DATE) %>%
-  summarise(FTE = round(sum(HOURS, na.rm = T)/75,2)) %>% #calculate FTE
-  mutate(DEPARTMENT = paste0(DEFINITION.CODE," - ",toupper(DEFINITION.NAME)), #capitalize department
-         DATES = as.character(PP.END.DATE)) %>% #add character form of data
-  arrange(PP.END.DATE) #arrange by pay period end date
-
-
-# Mount Sinai corporate colors "USE THIS TO ADD COLORS"
-MountSinai_colors <- c(
-  `light pink`   = "#fcc9e9",
-  `med pink`     = "#fa93d4",
-  `dark pink`    = "#d80b8c",
-  `light purple` = "#c7c6ef",
-  `med purple`   = "#8f8ce0",
-  `light blue`   = "#5cd3ff",
-  `med blue`     = "#06ABEB",
-  `dark blue`    = "#212070",
-  `light grey`   = "#b2b3b2",
-  `dark grey`    = "#686868",
-  `yellow`       = "#E69F00"
-)
-
-# Function to extract Mount Sinai colors as hex codes
-# Use Character names of MountSinai_colors
-
-MountSinai_cols <- function(...) {
-  cols <- c(...)
-
-  if (is.null(cols))
-    return (MountSinai_colors)
-
-  MountSinai_colors[cols]
-}
-
-# Create palettes
-MountSinai_palettes <- list(
-  `all`   = MountSinai_cols("med blue","dark pink","dark blue","light grey", "light blue",
-                            "light pink", "light purple","med pink","med purple","yellow" ),
-
-  `main`  = MountSinai_cols("med blue","dark pink","dark blue","dark grey","light pink","light blue","light grey"),
-
-  `pink`  = MountSinai_cols("light pink", "dark pink"),
-
-  `blue`  = MountSinai_cols("light blue", "dark blue"),
-
-  `grey`  = MountSinai_cols("light grey", "med blue")
-
-)
-MountSinai_palettes
-
-MountSinai_pal <- function(palette = "main", reverse = FALSE, ...) {
-  pal <- MountSinai_palettes[[palette]]
-
-  if (reverse) pal <- rev(pal)
-
-  colorRampPalette(pal, ...)
-}
-
-#Service Line Graphs
-service_line <- function(hosp,service){
-  library(tidyr)
-  data_service <- data %>% #take pre-filtered data
-    filter(PAYROLL == hosp, #filter on specific hospital
-           SERVICE.LINE == service) #filter on specific service line
-  data_service <- data_service %>% 
-    pivot_wider(id_cols = c("DEFINITION.CODE","DEFINITION.NAME","DEPARTMENT"),
-                names_from = "PP.END.DATE",
-                values_from = FTE) #pivot dataframe to bring in NAs for missing PP
-  data_service <- data_service %>% 
-    pivot_longer(cols = 4:ncol(data_service),
-                 names_to = "PP.END.DATE") #pivot dataframe to original form
-  data_service <- data_service %>% 
-    mutate(FTE = case_when(
-              is.na(value) ~ 0, #if FTE is NA -> 0
-              !is.na(value) ~ value), #else leave the value
-           DATES = as.factor(PP.END.DATE)) #turn dates into factor
-  data_service$DATES <- factor(data_service$DATES)
-  service_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=DEPARTMENT,color=DEPARTMENT))+
-    geom_line(size=1.5)+
-    geom_point(size=2.75)+
-    ggtitle(paste(hosp,service,"FTE's By Pay Period"))+
-    xlab("Pay Period")+
-    ylab("FTE (Full Time Equivalent)")+
-    scale_color_manual(values=MountSinai_pal("main")(length(unique(data_service$DEFINITION.CODE))))+
-    theme(plot.title=element_text(hjust=.5,size=20),
-          axis.title = element_text(face="bold"),
-          legend.text=element_text(size = 6)) #create and style service line graph
-  service_line_graphly <- ggplotly(service_line_graph,
-         tooltip=c("group","x","y")) %>%
-    layout(title = list(xanchor = "center")) #turn graph into plotly interactive
-  return(service_line_graphly)
-}
-
-#Kable
-k <- function(hosp,service){
-  library(tidyr)
-  kdata <- data %>% 
-    filter(PAYROLL == hosp, 
-           SERVICE.LINE == service) %>% 
-    pivot_wider(id_cols = c(SERVICE.LINE,DEPARTMENT),
-                names_from = DATES,
-                values_from = FTE) 
-  kdata[is.na(kdata)] <- 0 
-  colnames(kdata)[1] <- "SERVICE LINE" 
-  sort <- colnames(kdata)[ncol(kdata)] 
-  kdata <- kdata %>% ungroup() %>% arrange(desc(!!sym(sort))) 
-  Ktable <<- kdata 
-}
+source("Dashboard_Functions.R")
 ```
 
+## Mount Sinai Health System
+### `r service_lines[[1]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[1]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[2]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[2]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[3]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[3]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[4]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[4]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[5]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[5]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[6]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[6]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[6]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[6]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[7]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[7]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[8]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[8]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[9]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[9]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[10]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[10]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[11]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[11]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[12]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[12]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
+### `r service_lines[[13]]`
+```{r, echo=F,warning=F,message=F}
+# Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[13]]))
+# Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+# kable(Service_Line_table2) %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+#   row_spec(0, background = "#212070", color = "white") %>%
+#   row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+#   row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+#   column_spec(1,bold = T) #%>%
+#   #collapse_rows(1)
+```
+### `r service_lines[[14]]`
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[14]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+kable(Service_Line_table2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
+  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) #%>%
+  #collapse_rows(1)
+```
 ## `r site_list[[1]]`
 ### `r MSH_service_list[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
@@ -156,8 +210,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[1]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[1]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -165,7 +217,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[2]]`
@@ -175,8 +226,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[2]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[2]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -193,8 +242,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[3]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[3]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -211,8 +258,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[4]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[4]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -220,7 +265,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[5]]`
@@ -230,8 +274,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[5]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[5]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -239,7 +281,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[6]]`
@@ -249,8 +290,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[6]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[6]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -258,7 +297,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[7]]`
@@ -268,8 +306,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[7]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[7]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -277,7 +313,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[8]]`
@@ -287,8 +322,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[8]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[8]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -296,7 +329,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[9]]`
@@ -306,8 +338,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[9]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[9]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -315,7 +345,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[10]]`
@@ -325,8 +354,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[10]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[10]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -334,7 +361,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[11]]`
@@ -344,8 +370,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[11]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[11]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -353,7 +377,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[12]]`
@@ -363,8 +386,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[12]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[12]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -372,7 +393,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSH_service_list[[13]]`
@@ -382,8 +402,6 @@ service_line(hosp = site_list[[1]], service = MSH_service_list[[13]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[1]], service = MSH_service_list[[13]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -391,7 +409,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ## `r site_list[[2]]`
@@ -402,8 +419,6 @@ service_line(hosp = site_list[[2]], service = MSQ_service_list[[1]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[2]], service = MSQ_service_list[[1]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -411,7 +426,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSQ_service_list[[2]]`
@@ -421,8 +435,6 @@ service_line(hosp = site_list[[2]], service = MSQ_service_list[[2]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[2]], service = MSQ_service_list[[2]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -430,7 +442,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSQ_service_list[[3]]`
@@ -440,8 +451,6 @@ service_line(hosp = site_list[[2]], service = MSQ_service_list[[3]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[2]], service = MSQ_service_list[[3]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -449,7 +458,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSQ_service_list[[4]]`
@@ -459,8 +467,6 @@ service_line(hosp = site_list[[2]], service = MSQ_service_list[[4]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[2]], service = MSQ_service_list[[4]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -468,7 +474,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSQ_service_list[[5]]`
@@ -478,8 +483,6 @@ service_line(hosp = site_list[[2]], service = MSQ_service_list[[5]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[2]], service = MSQ_service_list[[5]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -487,7 +490,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSQ_service_list[[6]]`
@@ -497,8 +499,6 @@ service_line(hosp = site_list[[2]], service = MSQ_service_list[[6]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[2]], service = MSQ_service_list[[6]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -506,7 +506,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSQ_service_list[[7]]`
@@ -516,8 +515,6 @@ service_line(hosp = site_list[[2]], service = MSQ_service_list[[7]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[2]], service = MSQ_service_list[[7]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -525,7 +522,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ## `r site_list[[3]]`
@@ -536,8 +532,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[1]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[1]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -545,7 +539,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[2]]`
@@ -555,8 +548,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[2]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[2]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -564,7 +555,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[3]]`
@@ -574,8 +564,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[3]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[3]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -583,7 +571,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[4]]`
@@ -593,8 +580,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[4]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[4]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -602,7 +587,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[5]]`
@@ -612,8 +596,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[5]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[5]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -621,7 +603,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[6]]`
@@ -631,8 +612,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[6]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[6]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -640,7 +619,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[7]]`
@@ -650,8 +628,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[7]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[7]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -659,7 +635,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[8]]`
@@ -669,8 +644,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[8]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[8]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -678,7 +651,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[9]]`
@@ -688,8 +660,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[9]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[9]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -697,7 +667,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[10]]`
@@ -707,8 +676,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[10]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[10]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -716,7 +683,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSBI_service_list[[11]]`
@@ -726,8 +692,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[11]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[3]], service = MSBI_service_list[[11]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -735,7 +699,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ## `r site_list[[4]]`
@@ -746,8 +709,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[1]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[1]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -755,7 +716,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSB_service_list[[2]]`
@@ -765,8 +725,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[2]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[2]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -774,7 +732,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSB_service_list[[3]]`
@@ -784,8 +741,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[3]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[3]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -793,7 +748,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSB_service_list[[4]]`
@@ -803,8 +757,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[4]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[4]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -812,7 +764,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSB_service_list[[5]]`
@@ -822,8 +773,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[5]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[5]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -831,7 +780,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSB_service_list[[6]]`
@@ -841,8 +789,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[6]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[6]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -850,7 +796,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSB_service_list[[7]]`
@@ -860,8 +805,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[7]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[7]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -869,7 +812,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSB_service_list[[8]]`
@@ -879,8 +821,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[8]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[8]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -888,7 +828,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSB_service_list[[9]]`
@@ -898,8 +837,6 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[9]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[4]], service = MSB_service_list[[9]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -907,7 +844,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ## `r site_list[[5]]`
@@ -918,8 +854,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[1]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[1]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -927,7 +861,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[2]]`
@@ -937,8 +870,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[2]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[2]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -946,7 +877,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[3]]`
@@ -956,8 +886,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[3]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[3]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -965,7 +893,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[4]]`
@@ -975,8 +902,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[4]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[4]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -984,7 +909,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[5]]`
@@ -994,8 +918,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[5]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[5]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1003,7 +925,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[6]]`
@@ -1013,8 +934,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[6]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[6]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1022,7 +941,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[7]]`
@@ -1032,8 +950,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[7]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[7]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1041,7 +957,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[8]]`
@@ -1051,8 +966,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[8]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[8]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1060,7 +973,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[9]]`
@@ -1070,8 +982,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[9]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[9]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1079,7 +989,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[10]]`
@@ -1089,8 +998,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[10]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[10]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1098,7 +1005,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[11]]`
@@ -1108,8 +1014,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[11]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[11]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1117,7 +1021,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSW_service_list[[12]]`
@@ -1127,8 +1030,6 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[12]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[5]], service = MSW_service_list[[12]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1136,7 +1037,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ## `r site_list[[6]]`
@@ -1147,8 +1047,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[1]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[1]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1156,7 +1054,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[2]]`
@@ -1166,8 +1063,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[2]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[2]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1175,7 +1070,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[3]]`
@@ -1185,8 +1079,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[3]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[3]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1194,7 +1086,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[4]]`
@@ -1204,8 +1095,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[4]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[4]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1213,7 +1102,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[5]]`
@@ -1223,8 +1111,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[5]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[5]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1232,7 +1118,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[6]]`
@@ -1242,8 +1127,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[6]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[6]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1251,7 +1134,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[7]]`
@@ -1261,8 +1143,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[7]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[7]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1270,7 +1150,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[8]]`
@@ -1280,8 +1159,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[8]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[8]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1289,7 +1166,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[9]]`
@@ -1299,8 +1175,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[9]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[9]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1308,7 +1182,6 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
 ### `r MSM_service_list[[10]]`
@@ -1318,8 +1191,6 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[10]])
 ```
 
 ```{r, echo=F,warning=F,message=F}
-library(knitr)
-library(kableExtra)
 k(hosp = site_list[[6]], service = MSM_service_list[[10]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -1327,6 +1198,5 @@ kable(Ktable) %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
   row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
-  column_spec(3:ncol(Ktable),width = "30em") %>%
   collapse_rows(1)
 ```
