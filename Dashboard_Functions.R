@@ -160,7 +160,14 @@ k <- function(hosp,service){
   kdata$`Baseline Avg.` <- rowMeans(subset(kdata, select = c("2020-01-04","2020-01-18","2020-02-01","2020-02-15","2020-02-29"), na.rm = TRUE))
   kdata <- kdata[,c(1:2,(ncol(kdata)-9):ncol(kdata))]
   kdata[,(ncol(kdata)-9):ncol(kdata)] <- round(kdata[,(ncol(kdata)-9):ncol(kdata)],digits_round)
-  Ktable <<- kdata 
+  Ktable <- kdata 
+  kable(Ktable) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+    row_spec(0, background = "#212070", color = "white") %>%
+    row_spec(1:nrow(Ktable), color = "black") %>%
+    row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
+    column_spec(1,bold = T) %>%
+    collapse_rows(1)
 }
 
 #System level Kable
@@ -197,7 +204,13 @@ premier_sum_stats <- function(sys.sum, site, serv.line){
   data_final <- left_join(data_current, data_report_ave)
   data_final <- left_join(data_final, data_pre_covid_ave)
   colnames(data_final)[1:2] <- c('Site', 'Service Line')
-  return(data_final)
+  kable(data_final) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+    row_spec(0, background = "#212070", color = "white") %>%
+    row_spec(1:nrow(data_final), color = "black") %>%
+    row_spec(0:nrow(data_final), align = "c", font_size = 11) %>%
+    column_spec(1,bold = T) %>%
+    collapse_rows(1)
 }
 
 # Generating Graph Data Function ------------------------------------------
