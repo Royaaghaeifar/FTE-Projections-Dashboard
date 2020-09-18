@@ -41,6 +41,7 @@ Source_Summary <- function(data){
   
   #Bring in Provider Column
   System_Jobcode <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/All Sites Job Code Mappings.xlsx")
+  System_Jobcode <- distinct(System_Jobcode)
   Site_Summary <- left_join(Site_Summary,System_Jobcode, by = c("PAYROLL"="PAYROLL", "J.C"="J.C")) %>%
     select(c(1:16,18))
   
