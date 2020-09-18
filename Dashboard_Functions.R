@@ -22,16 +22,13 @@ report_period_length <- 3
 biweekly_fte <- 75
 digits_round <- 2
 
-Ktable <- as.data.frame(System_Summary)
-Suport_Service_table2 <- as.data.frame(System_Summary)
-
 #Site Based Service List
-MSH_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-MSQ_service_list <- list("ICU","Med/Surg","Perioperative Services","Support Services","Pharmacy","Radiology","Emergency Department")
-MSBI_service_list <- list("ICU","Progressive","Med/Surg","Psych","RETU","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-MSB_service_list <- list("ICU","Progressive","Med/Surg","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-MSW_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
-MSM_service_list <- list("ICU","Progressive","Med/Surg","Psych","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department")
+MSH_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSQ_service_list <- list("ICU","Med/Surg","Perioperative Services","Support Services","Pharmacy","Radiology","Emergency Department","Other")
+MSBI_service_list <- list("ICU","Progressive","Med/Surg","Psych","RETU","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSB_service_list <- list("ICU","Progressive","Med/Surg","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSW_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSM_service_list <- list("ICU","Progressive","Med/Surg","Psych","Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
 site_list <- list("MSH","MSQ","MSBI","MSB","MSW","MSM")
 
 #Pre filter data 
@@ -42,11 +39,20 @@ data <- System_Summary %>%
          INCLUDE.HOURS == 1, #only use included hour paycodes
          PAY.CODE.MAPPING %in% worked_paycodes) %>% #remove unproductive paycodes 
   group_by(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,SERVICE.LINE,PP.END.DATE) %>%
-  summarise(FTE = round(sum(HOURS, na.rm = T)/biweekly_fte,digits_round)) %>% #calculate FTE
+  summarise(FTE = sum(HOURS, na.rm = T)/biweekly_fte) %>% #calculate FTE
   mutate(DEPARTMENT = paste0(DEFINITION.CODE," - ",toupper(DEFINITION.NAME)), #capitalize department
          DATES = as.character(PP.END.DATE)) %>% #add character form of data
   arrange(PP.END.DATE) #arrange by pay period end date
 
+#Get Reporting Period data range
+rep <- data %>% ungroup() %>% select(PP.END.DATE) %>% as.vector() %>% distinct() %>% 
+  mutate(PP.END.DATE2 = paste0(substr(PP.END.DATE,6,7),"/",
+                               substr(PP.END.DATE,9,10),"/",
+                               substr(PP.END.DATE,1,4)))
+rep_per <- as.vector(rep[c(nrow(rep)-2,nrow(rep)-1,nrow(rep)),1])
+rep_per$PP.END.DATE <- as.character(rep_per$PP.END.DATE)
+rep <- as.character(rep$PP.END.DATE2)
+rep <- paste(rep[length(rep)-2]," to ",rep[length(rep)])
 
 # Mount Sinai corporate colors "USE THIS TO ADD COLORS"
 MountSinai_colors <- c(
@@ -117,7 +123,8 @@ service_line <- function(hosp,service){
     mutate(FTE = case_when(
       is.na(value) ~ 0, #if FTE is NA -> 0
       !is.na(value) ~ value), #else leave the value
-      DATES = as.factor(PP.END.DATE)) #turn dates into factor
+      DATES = as.factor(PP.END.DATE),
+      FTE = round(FTE,digits_round)) #turn dates into factor
   data_service$DATES <- factor(data_service$DATES)
   service_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=DEPARTMENT,color=DEPARTMENT))+
     geom_line(size=1.5)+
@@ -149,9 +156,10 @@ k <- function(hosp,service){
   colnames(kdata)[1] <- "SERVICE LINE" 
   sort <- colnames(kdata)[ncol(kdata)] 
   kdata <- kdata %>% ungroup() %>% arrange(desc(!!sym(sort))) 
+  kdata$`Reporting Period Avg.` <- apply(kdata[,(ncol(kdata)-2):ncol(kdata)],1,mean)
   kdata$`Baseline Avg.` <- rowMeans(subset(kdata, select = c("2020-01-04","2020-01-18","2020-02-01","2020-02-15","2020-02-29"), na.rm = TRUE))
-  kdata$`Baseline Avg.` <- round(kdata$`Baseline Avg.`,digits_round)
-  kdata <- kdata[,c(1:2,(ncol(kdata)-8):ncol(kdata))]
+  kdata <- kdata[,c(1:2,(ncol(kdata)-9):ncol(kdata))]
+  kdata[,(ncol(kdata)-9):ncol(kdata)] <- round(kdata[,(ncol(kdata)-9):ncol(kdata)],digits_round)
   Ktable <<- kdata 
 }
 
@@ -173,7 +181,7 @@ premier_sum_stats <- function(sys.sum, site, serv.line){
            HOURS = round(HOURS/(biweekly_fte*length(pre_covid_PP)),digits_round)) %>%
     pivot_wider(names_from = PP.END.DATE, values_from = HOURS, values_fn = list(HOURS = sum))
   #Calculating Report Period FTEs
-  PayPeriods <- data_export %>% select(PP.END.DATE) %>% distinct() %>% slice(1:(report_period_length*2))
+  PayPeriods <- data_export %>% select(PP.END.DATE) %>% distinct() %>% slice(1:(report_period_length))
   data_current <- data_export %>% 
     filter(PP.END.DATE %in% PayPeriods$PP.END.DATE) %>% arrange(PP.END.DATE) %>%
     mutate(HOURS = round(HOURS/biweekly_fte,digits_round),
@@ -190,4 +198,22 @@ premier_sum_stats <- function(sys.sum, site, serv.line){
   data_final <- left_join(data_final, data_pre_covid_ave)
   colnames(data_final)[1:2] <- c('Site', 'Service Line')
   return(data_final)
+}
+
+# Generating Graph Data Function ------------------------------------------
+graph_data <- function(sys.sum, site, serv.line){
+  #Pre Processsing Data
+  data_export <- System_Summary %>% ungroup() %>% as.data.frame() %>%
+    select(PAYROLL, SERVICE.LINE, PP.END.DATE, PAY.CODE.MAPPING, PROVIDER, HOURS,INCLUDE.HOURS) %>%
+    filter(PAYROLL == site,
+           SERVICE.LINE == serv.line,
+           PROVIDER == 0,
+           INCLUDE.HOURS == 1,
+           PAY.CODE.MAPPING %in% worked_paycodes) %>%
+    select(PAYROLL, SERVICE.LINE, PP.END.DATE, HOURS) %>%
+    arrange(desc(PP.END.DATE)) %>% 
+    group_by(PAYROLL, SERVICE.LINE, PP.END.DATE) %>%
+    summarize(HOURS = sum(HOURS, na.rm = T)) %>%
+    mutate(FTE = round((HOURS/biweekly_fte), digits = digits_round))
+  return(data_export)
 }
