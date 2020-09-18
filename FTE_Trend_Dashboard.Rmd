@@ -20,12 +20,13 @@ div.main-container {
 ```{r, echo=F,warning=F,message=F,results='hide'}
 source("Dashboard_Functions.R")
 ```
-
+#### Reporting Period: `r rep`
+#### Baseline Period: 01/04/2020 to 02/29/2020
 ## Mount Sinai Health System
 ### `r service_lines[[1]]`
 ```{r, echo=F,warning=F,message=F}
 Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[1]]))
-Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
+Service_Line_table2 <- do.call(plyr::rbind.fill, Service_Line_table2) %>% mutate(`Service Line` = NULL)
 kable(Service_Line_table2) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
   row_spec(0, background = "#212070", color = "white") %>%
@@ -73,18 +74,6 @@ kable(Service_Line_table2) %>%
 ### `r service_lines[[5]]`
 ```{r, echo=F,warning=F,message=F}
 Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[5]]))
-Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
-kable(Service_Line_table2) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
-  row_spec(0, background = "#212070", color = "white") %>%
-  row_spec(1:nrow(Service_Line_table2), color = "black") %>%
-  row_spec(0:nrow(Service_Line_table2), align = "c", font_size = 11) %>%
-  column_spec(1,bold = T) #%>%
-  #collapse_rows(1)
-```
-### `r service_lines[[6]]`
-```{r, echo=F,warning=F,message=F}
-Service_Line_table2 <- lapply(unique(System_Summary$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[6]]))
 Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)
 kable(Service_Line_table2) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
@@ -231,7 +220,7 @@ kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
   row_spec(0, background = "#212070", color = "white") %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
-  row_spec(0:nrow(Ktable), align = "c") %>%
+  row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
   collapse_rows(1)
 ```
@@ -247,7 +236,7 @@ kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
   row_spec(0, background = "#212070", color = "white") %>%
   row_spec(1:nrow(Ktable), color = "black") %>%
-  row_spec(0:nrow(Ktable), align = "c") %>%
+  row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
   column_spec(1,bold = T) %>%
   collapse_rows(1)
 ```
@@ -411,6 +400,22 @@ kable(Ktable) %>%
   column_spec(1,bold = T) %>%
   collapse_rows(1)
 ```
+### `r MSH_service_list[[14]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+#lapply(MSH_service_list,function(x)service_line(hosp="MSH",service=x))
+service_line(hosp = site_list[[1]], service = MSH_service_list[[14]])
+```
+
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[14]])
+kable(Ktable) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Ktable), color = "black") %>%
+  row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) %>%
+  collapse_rows(1)
+```
 ## `r site_list[[2]]`
 ### `r MSQ_service_list[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
@@ -516,6 +521,22 @@ service_line(hosp = site_list[[2]], service = MSQ_service_list[[7]])
 
 ```{r, echo=F,warning=F,message=F}
 k(hosp = site_list[[2]], service = MSQ_service_list[[7]])
+kable(Ktable) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Ktable), color = "black") %>%
+  row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) %>%
+  collapse_rows(1)
+```
+### `r MSQ_service_list[[8]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+#lapply(MSQ_service_list,function(x)service_line(hosp="MSH",service=x))
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[8]])
+```
+
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[8]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
   row_spec(0, background = "#212070", color = "white") %>%
@@ -701,6 +722,22 @@ kable(Ktable) %>%
   column_spec(1,bold = T) %>%
   collapse_rows(1)
 ```
+### `r MSBI_service_list[[12]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+#lapply(MSH_service_list,function(x)service_line(hosp="MSH",service=x))
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[12]])
+```
+
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[12]])
+kable(Ktable) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Ktable), color = "black") %>%
+  row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) %>%
+  collapse_rows(1)
+```
 ## `r site_list[[4]]`
 ### `r MSB_service_list[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
@@ -838,6 +875,22 @@ service_line(hosp = site_list[[4]], service = MSB_service_list[[9]])
 
 ```{r, echo=F,warning=F,message=F}
 k(hosp = site_list[[4]], service = MSB_service_list[[9]])
+kable(Ktable) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Ktable), color = "black") %>%
+  row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) %>%
+  collapse_rows(1)
+```
+### `r MSB_service_list[[10]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+#lapply(MSH_service_list,function(x)service_line(hosp="MSH",service=x))
+service_line(hosp = site_list[[4]], service = MSB_service_list[[10]])
+```
+
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[10]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
   row_spec(0, background = "#212070", color = "white") %>%
@@ -1039,6 +1092,22 @@ kable(Ktable) %>%
   column_spec(1,bold = T) %>%
   collapse_rows(1)
 ```
+### `r MSW_service_list[[13]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+#lapply(MSH_service_list,function(x)service_line(hosp="MSH",service=x))
+service_line(hosp = site_list[[5]], service = MSW_service_list[[13]])
+```
+
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[13]])
+kable(Ktable) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Ktable), color = "black") %>%
+  row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) %>%
+  collapse_rows(1)
+```
 ## `r site_list[[6]]`
 ### `r MSM_service_list[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
@@ -1192,6 +1261,22 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[10]])
 
 ```{r, echo=F,warning=F,message=F}
 k(hosp = site_list[[6]], service = MSM_service_list[[10]])
+kable(Ktable) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
+  row_spec(0, background = "#212070", color = "white") %>%
+  row_spec(1:nrow(Ktable), color = "black") %>%
+  row_spec(0:nrow(Ktable), align = "c", font_size = 11) %>%
+  column_spec(1,bold = T) %>%
+  collapse_rows(1)
+```
+### `r MSM_service_list[[11]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+#lapply(MSH_service_list,function(x)service_line(hosp="MSH",service=x))
+service_line(hosp = site_list[[6]], service = MSM_service_list[[11]])
+```
+
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[11]])
 kable(Ktable) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
   row_spec(0, background = "#212070", color = "white") %>%
