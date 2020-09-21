@@ -105,7 +105,7 @@ MountSinai_pal <- function(palette = "main", reverse = FALSE, ...) {
   colorRampPalette(pal, ...)
 }
 
-#Service Line Graphs
+#Site Level Service Line Graphs
 service_line <- function(hosp,service){
   library(tidyr)
   data_service <- data %>% #take pre-filtered data
@@ -172,61 +172,58 @@ k <- function(hosp,service){
 
 #System level Kable
 premier_sum_stats <- function(sys.sum, site, serv.line){
-  #Pre Processsing Data
-  data_export <- System_Summary %>% ungroup() %>% as.data.frame() %>%
-    select(PAYROLL, SERVICE.LINE, PP.END.DATE, PAY.CODE.MAPPING, PROVIDER, HOURS,INCLUDE.HOURS) %>%
+  data_export <- data %>% 
+    ungroup() %>%
+    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE) %>%
     filter(PAYROLL == site,
-           SERVICE.LINE == serv.line,
-           PROVIDER == 0,
-           INCLUDE.HOURS == 1,
-           PAY.CODE.MAPPING %in% worked_paycodes) %>%
-    select(PAYROLL, SERVICE.LINE, PP.END.DATE, HOURS) %>%
-    arrange(desc(PP.END.DATE))
-  #Calculating Pre Covid FTE Average
-  data_pre_covid_ave <- data_export %>% filter(PP.END.DATE %in% pre_covid_PP) %>% 
-    mutate(PP.END.DATE = "Baseline Avg.", 
-           HOURS = round(HOURS/(biweekly_fte*length(pre_covid_PP)),digits_round)) %>%
-    pivot_wider(names_from = PP.END.DATE, values_from = HOURS, values_fn = list(HOURS = sum))
-  #Calculating Report Period FTEs
-  PayPeriods <- data_export %>% select(PP.END.DATE) %>% distinct() %>% slice(1:(report_period_length))
-  data_current <- data_export %>% 
-    filter(PP.END.DATE %in% PayPeriods$PP.END.DATE) %>% arrange(PP.END.DATE) %>%
-    mutate(HOURS = round(HOURS/biweekly_fte,digits_round),
-           PP.END.DATE = format(PP.END.DATE, '%m/%d')) %>%
-    pivot_wider(names_from = PP.END.DATE,values_from = HOURS, values_fn = list(HOURS = sum))
-  #Calculating Report Average
-  data_report_ave <- data_export %>%
-    filter(PP.END.DATE %in% PayPeriods$PP.END.DATE[1:report_period_length]) %>%
-    mutate(PP.END.DATE = 'Report Period Avg.',
-           HOURS = round(HOURS/(biweekly_fte*report_period_length),digits_round)) %>%
-    pivot_wider(names_from = PP.END.DATE,values_from = HOURS, values_fn = list(HOURS = sum))
-  #Combining and formatting
-  data_final <- left_join(data_current, data_report_ave)
-  data_final <- left_join(data_final, data_pre_covid_ave)
-  colnames(data_final)[1:2] <- c('Site', 'Service Line')
-  kable(data_final) %>%
+           SERVICE.LINE == serv.line) %>%
+    group_by(PAYROLL,SERVICE.LINE,PP.END.DATE) %>%
+    summarise(FTE = sum(FTE, na.rm = T)) %>%
+    pivot_wider(id_cols = c(PAYROLL,SERVICE.LINE),
+                names_from = PP.END.DATE,
+                values_from = FTE) %>%
+    ungroup() %>%
+    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+  data_export$`Reporting Period Avg.` <- apply(data_export[,(ncol(data_export)-2):ncol(data_export)],1,mean)
+  data_export$`Baseline Avg.` <- rowMeans(subset(data_export, select = c("2020-01-04","2020-01-18","2020-02-01","2020-02-15","2020-02-29"), na.rm = TRUE))
+  data_export <- data_export[,c(1:2,(ncol(data_export)-9):ncol(data_export))]
+  data_export[,(ncol(data_export)-9):ncol(data_export)] <- round(data_export[,(ncol(data_export)-9):ncol(data_export)],digits_round)
+  colnames(data_export)[1:2] <- c('Site', 'Service Line')
+  data_final <- data_export
+  return(data_final)
+}
+system_kable <- function(table){
+  kable(table) %>%
     kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
     row_spec(0, background = "#212070", color = "white") %>%
-    row_spec(1:nrow(data_final), color = "black") %>%
-    row_spec(0:nrow(data_final), align = "c", font_size = 11) %>%
-    column_spec(1,bold = T) %>%
-    collapse_rows(1)
+    row_spec(1:nrow(table), color = "black") %>%
+    row_spec(0:nrow(table), align = "c", font_size = 11) %>%
+    column_spec(1,bold = T)
 }
 
-# Generating Graph Data Function ------------------------------------------
-graph_data <- function(sys.sum, site, serv.line){
-  #Pre Processsing Data
-  data_export <- System_Summary %>% ungroup() %>% as.data.frame() %>%
-    select(PAYROLL, SERVICE.LINE, PP.END.DATE, PAY.CODE.MAPPING, PROVIDER, HOURS,INCLUDE.HOURS) %>%
-    filter(PAYROLL == site,
-           SERVICE.LINE == serv.line,
-           PROVIDER == 0,
-           INCLUDE.HOURS == 1,
-           PAY.CODE.MAPPING %in% worked_paycodes) %>%
-    select(PAYROLL, SERVICE.LINE, PP.END.DATE, HOURS) %>%
-    arrange(desc(PP.END.DATE)) %>% 
-    group_by(PAYROLL, SERVICE.LINE, PP.END.DATE) %>%
-    summarize(HOURS = sum(HOURS, na.rm = T)) %>%
-    mutate(FTE = round((HOURS/biweekly_fte), digits = digits_round))
-  return(data_export)
+#System level service line graph
+graph_data <- function(serv.line){
+  data_export <- data %>% 
+    ungroup() %>%
+    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(SERVICE.LINE == serv.line) %>%
+    group_by(PAYROLL,SERVICE.LINE,PP.END.DATE,DATES) %>%
+    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+    ungroup() %>%
+    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+  system_line_graph <- ggplot(data = data_export, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))+
+    geom_line(size=1.5)+
+    geom_point(size=2.75)+
+    ggtitle(paste(serv.line,"FTE's By Pay Period"))+
+    xlab("Pay Period")+
+    ylab("FTE (Full Time Equivalent)")+
+    scale_color_manual(values=MountSinai_pal("main")(length(unique(data_export$PAYROLL))))+
+    theme(plot.title=element_text(hjust=.5,size=20),
+          axis.title = element_text(face="bold"),
+          legend.text=element_text(size = 6)) #create and style service line graph
+  system_line_graphly <- ggplotly(system_line_graph,tooltip=c("group","x","y")) %>%
+    config(displaylogo = F,
+           modeBarButtonsToRemove = c("lasso2d","autoScale2d","select2d","toggleSpikelines")) %>%
+    layout(title = list(xanchor = "center")) #turn graph into plotly interactive
+  return(system_line_graphly)
 }
