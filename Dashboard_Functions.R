@@ -46,14 +46,11 @@ data <- System_Summary %>%
   arrange(PP.END.DATE) #arrange by pay period end date
 
 #Get Reporting Period data range
-rep <- data %>% ungroup() %>% select(PP.END.DATE) %>% as.vector() %>% distinct() %>% 
-  mutate(PP.END.DATE2 = paste0(substr(PP.END.DATE,6,7),"/",
-                               substr(PP.END.DATE,9,10),"/",
-                               substr(PP.END.DATE,1,4)))
+rep <- data %>% ungroup() %>% select(PP.END.DATE) %>% as.vector() %>% distinct() 
 rep_per <- as.vector(rep[c(nrow(rep)-2,nrow(rep)-1,nrow(rep)),1])
+rep_per[1,1] <- rep_per[1,1]-13
 rep_per$PP.END.DATE <- as.character(rep_per$PP.END.DATE)
-rep <- as.character(rep$PP.END.DATE2)
-rep <- paste(rep[length(rep)-2]," to ",rep[length(rep)])
+rep <- paste0(substr(rep_per[1,1],6,7),"/",substr(rep_per[1,1],9,10),"/",substr(rep_per[1,1],1,4)," to ",substr(rep_per[3,1],6,7),"/",substr(rep_per[3,1],9,10),"/",substr(rep_per[3,1],1,4))
 
 # Mount Sinai corporate colors "USE THIS TO ADD COLORS"
 MountSinai_colors <- c(
