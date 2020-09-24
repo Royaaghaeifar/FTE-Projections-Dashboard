@@ -16,6 +16,4 @@ System_Summary = do.call("rbind",System_Summary_List)
 #Create table of all rows that failed a mapping
 #Payroll, Jobcode, Jobcode description, Pay Code, Provider
 Error_Report <- filter(System_Summary,is.na(PAYROLL)|is.na(J.C)|is.na(J.C.DESCRIPTION)|is.na(PAY.CODE.MAPPING)|is.na(PROVIDER))
-#Save System Summary table
-saveRDS(System_Summary,file = "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary/System_Summary.rds")
 #########################################################################################
