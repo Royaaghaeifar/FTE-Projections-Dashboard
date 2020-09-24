@@ -17,9 +17,9 @@ Source_Summary <- function(data){
   }
   
   #Read in paycycle
-  PayCycle <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/PayCycle.csv", header = T, stringsAsFactors = F)
+  PayCycle <- read_excel("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Useful Tools & Templates/Pay Cycle Calendar.xlsx")
   PayCycle <- PayCycle %>%
-    mutate(Date.1 = as.Date(Date.1, format = "%m/%d/%Y")) %>%
+    mutate(Date = as.Date(Date, format = "%m/%d/%Y")) %>%
     mutate(Start.Date = as.Date(Start.Date, format = "%m/%d/%Y")) %>%
     mutate(End.Date = as.Date(End.Date, format = "%m/%d/%Y"))
   
@@ -29,7 +29,7 @@ Source_Summary <- function(data){
     summarise(HOURS = sum(HOURS, na.rm = T), EXPENSE = sum(EXPENSE, na.rm = T))
   
   #assign pp end dates and summarize
-  Summary <- left_join(Department,PayCycle,by = c("END.DATE" = "Date.1")) %>%
+  Summary <- left_join(Department,PayCycle,by = c("END.DATE" = "Date")) %>%
     select(PAYROLL,WRKD.LOCATION,HOME.LOCATION,DPT.WRKD,DPT.HOME,WRKD.DESCRIPTION,HOME.DESCRIPTION,J.C,J.C.DESCRIPTION,PAY.CODE,End.Date,HOURS,EXPENSE) %>%
     group_by(PAYROLL,WRKD.LOCATION,HOME.LOCATION,DPT.WRKD,DPT.HOME,WRKD.DESCRIPTION,HOME.DESCRIPTION,J.C,J.C.DESCRIPTION,PAY.CODE,End.Date) %>%
     summarize(HOURS = sum(HOURS, na.rm = T),EXPENSE = sum(EXPENSE, na.rm = T))
@@ -47,7 +47,13 @@ Source_Summary <- function(data){
   
   #Bring in cost center mappings
   System_Department <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/All Sites Cost Center Mappings.xlsx")
-  Site_Summary <- left_join(Site_Summary,System_Department, by = c("DPT.WRKD" = "COST.CENTER"))
+  Site_Summary <- left_join(Site_Summary,System_Department, by = c("DPT.WRKD" = "COST.CENTER")) %>%
+    ungroup() %>%
+    mutate(SITE = case_when(
+      is.na(SITE) ~ PAYROLL,
+      TRUE ~ SITE),
+      PAYROLL = SITE,
+      SITE = NULL) 
   
   Site_Summary <- Site_Summary %>% distinct()
   
