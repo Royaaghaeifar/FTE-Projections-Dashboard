@@ -21,7 +21,7 @@ div.main-container {
 source("Dashboard_Functions.R")
 ```
 #### Reporting Period: `r rep`
-#### Baseline Period: 01/04/2020 to 02/29/2020
+#### Baseline Period: 12/22/2020 to 02/29/2020
 ## Mount Sinai Health System
 ### `r service_lines[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
