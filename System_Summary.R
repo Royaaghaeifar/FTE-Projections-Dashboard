@@ -17,3 +17,4 @@ System_Summary = do.call("rbind",System_Summary_List)
 #Payroll, Jobcode, Jobcode description, Pay Code, Provider
 Error_Report <- filter(System_Summary,is.na(PAYROLL)|is.na(J.C)|is.na(J.C.DESCRIPTION)|is.na(PAY.CODE.MAPPING)|is.na(PROVIDER))
 #########################################################################################
+
