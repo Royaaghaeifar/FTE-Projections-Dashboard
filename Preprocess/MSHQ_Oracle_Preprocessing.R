@@ -42,6 +42,7 @@ colnames(oracle)[c(6,7,12:15,29,30,32,33,35:37)] = c("START.DATE","END.DATE","J.
                                                "WRKD.DESCRIPTION","DPT.WRKD","DPT.HOME","HOURS","EXPENSE",
                                                "WRKD.LOCATION","HOME.LOCATION","J.C.DESCRIPTION")
 #Only take necessary columns
-data_MSH_MSQ_oracle <- select(oracle,c(6,7,12:15,29,30,32:37))
+#data_MSH_MSQ_oracle <- select(oracle,c(6,7,12:15,29,30,32:37))
+data_MSH_MSQ_oracle <<- oracle
 
 rm(Blank,COA,JCdesc,oracle)
