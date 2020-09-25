@@ -1,5 +1,5 @@
 
-dir <- getwd()
+direct <- getwd()
 
 ##Refresh Master#########################################################################
 #create list of preprocessed files
