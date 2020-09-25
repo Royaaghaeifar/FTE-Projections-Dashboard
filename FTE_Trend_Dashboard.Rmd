@@ -383,13 +383,6 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[11]])
 ```{r, echo=F,warning=F,message=F}
 k(hosp = site_list[[3]], service = MSBI_service_list[[11]])
 ```
-### `r MSBI_service_list[[12]]`
-```{r, echo=F,warning=F,message=F,fig.width=12}
-service_line(hosp = site_list[[3]], service = MSBI_service_list[[12]])
-```
-```{r, echo=F,warning=F,message=F}
-k(hosp = site_list[[3]], service = MSBI_service_list[[12]])
-```
 ## `r site_list[[4]]`
 ### `r MSB_service_list[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
