@@ -5,10 +5,10 @@
 library(dplyr)
 library(readxl)
 
-#dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-dir_ref <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/MSBIB Reference/"
+dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
+dir_ref <- paste0(dir, "MSBIB Reference/")
 
-data_MSBI_MSB <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/data_MSBI_MSB.rds")
+data_MSBI_MSB <- readRDS(paste0(dir, "Reference Tables/data_MSBI_MSB.rds"))
 
 # Inputs/Imports ----------------------------------------------------------
 
@@ -27,6 +27,8 @@ loc_desc <- read_excel(
 jc_dict <- read_excel(
   paste0(dir_ref, "MSBI Job Code Dictionary.xlsx")
 )
+jc_dict_MSLW <- read_excel(paste0(dir, "MSLW Reference Tables/MSLW Job Codes.xlsx"))
+jc_dict_MSLW <- jc_dict_MSLW %>% distinct()
 
 # Data Transformations ----------------------------------------------------
 
@@ -109,6 +111,17 @@ payroll_data_process <- merge(
   by.x = "Position Code Description", by.y = "Job Description",
   all.x = T, all.y = F
 )
+payroll_data_process <- merge(
+  payroll_data_process, select(jc_dict_MSLW, "Position Code Description", 'J.C'),
+  by.x = 'Position Code Description', by.y = 'Position Code Description',
+  all.x = T, all.y = F
+)
+payroll_data_process <- payroll_data_process %>%
+  mutate(`Job code` = case_when(
+    is.na(`Job code`) ~ J.C,
+    TRUE ~ `Job code`),
+    J.C = NULL)
+
 
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
@@ -136,4 +149,4 @@ data_MSBI_MSB <- payroll_data_process
 
 # Outputs/Exports ---------------------------------------------------------
 
-rm(coft_desc, jc_dict, loc_desc, payroll_data_process, simp_loc, dir_ref)
+rm(coft_desc, jc_dict, loc_desc, payroll_data_process, simp_loc, dir_ref, jc_dict_MSLW)
