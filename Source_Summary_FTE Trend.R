@@ -1,6 +1,6 @@
 Source_Func <- function(x){
-  source(paste0(getwd(),"/Preprocess/",x))
-  setwd(dir)
+  source(paste0(direct,"/Preprocess/",x))
+  setwd(direct)
 }
 
 Source_Summary <- function(data){
@@ -53,7 +53,7 @@ Source_Summary <- function(data){
   System_Jobcode <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/All Sites Job Code Mappings.xlsx")
   System_Jobcode <- distinct(System_Jobcode)
   Site_Summary <- left_join(Site_Summary,System_Jobcode, by = c("PAYROLL"="PAYROLL", "J.C"="J.C")) %>%
-    select(c(1:16,18))
+    select(c(1:19,21))
   
   Site_Summary <- Site_Summary %>% distinct()
 
