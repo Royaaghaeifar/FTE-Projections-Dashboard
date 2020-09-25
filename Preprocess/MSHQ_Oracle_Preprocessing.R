@@ -38,8 +38,8 @@ oracle <- oracle %>%
          Hours = as.numeric(Hours),
          Expense = as.numeric(Expense))
 #Column names
-colnames(oracle)[c(6,7,12:17,31,32,35:37)] = c("START.DATE","END.DATE","J.C","PAY.CODE","HOURS","EXPENSE",
-                                               "HOME.DESCRIPTION","WRKD.DESCRIPTION","DPT.WRKD","DPT.HOME",
+colnames(oracle)[c(6,7,12:15,29,30,32,33,35:37)] = c("START.DATE","END.DATE","J.C","PAY.CODE","HOME.DESCRIPTION",
+                                               "WRKD.DESCRIPTION","DPT.WRKD","DPT.HOME","HOURS","EXPENSE",
                                                "WRKD.LOCATION","HOME.LOCATION","J.C.DESCRIPTION")
 #Only take necessary columns
 data_MSH_MSQ_oracle <- select(oracle,c(6,7,12:17,31,32,34,35:37))
