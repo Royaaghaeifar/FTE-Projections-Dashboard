@@ -3,7 +3,7 @@ direct <- getwd()
 
 ##Refresh Master#########################################################################
 #create list of preprocessed files
-preprocess <- list.files(path=paste0(getwd(),"/Preprocess"))
+preprocess <- list.files(path=paste0(direct,"/Preprocess"))
 #bring in functions to run preprocess scripts and summarize them
 source("Source_Summary_FTE Trend.R")
 #Run source function
@@ -17,6 +17,7 @@ System_Summary = do.call("rbind",System_Summary_List)
 #Payroll, Jobcode, Jobcode description, Pay Code, Provider
 Error_Report <- filter(System_Summary,is.na(PAYROLL)|is.na(J.C)|is.na(J.C.DESCRIPTION)|is.na(PAY.CODE.MAPPING)|is.na(PROVIDER))
 #Save error report
+library(xlsx)
 write.xlsx(Error_Report,"J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Error_Report.xlsx")
 #########################################################################################
 
