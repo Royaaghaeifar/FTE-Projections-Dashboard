@@ -41,7 +41,9 @@ data <- System_Summary %>%
          PAY.CODE.MAPPING %in% worked_paycodes) %>% #remove unproductive paycodes 
   group_by(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,SERVICE.LINE,PP.END.DATE) %>%
   summarise(FTE = sum(HOURS, na.rm = T)/biweekly_fte) %>% #calculate FTE
-  mutate(DEPARTMENT = paste0(DEFINITION.CODE," - ",toupper(DEFINITION.NAME)), #capitalize department
+  mutate(DEPARTMENT = case_when(
+    is.na(DEFINITION.CODE) ~ "Non-Premier",
+    TRUE ~ paste0(DEFINITION.CODE," - ",toupper(DEFINITION.NAME))), #capitalize department
          DATES = as.character(PP.END.DATE)) %>% #add character form of data
   arrange(PP.END.DATE) #arrange by pay period end date
 
