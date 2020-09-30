@@ -106,6 +106,11 @@ payroll_data_process <- payroll_data_process %>%
     cc_hd_loc = LOC_Name
   )
 
+payroll_data_process <- payroll_data_process %>%
+  mutate(`Position Code Description` = case_when(
+    is.na(`Position Code Description`) ~ "OTHER",
+    TRUE ~ `Position Code Description`))
+
 payroll_data_process <- merge(
   payroll_data_process, select(jc_dict, "Job Description", "Job code"),
   by.x = "Position Code Description", by.y = "Job Description",
