@@ -49,6 +49,10 @@ dict_site <- read_xlsx(paste0(folder_references, '/Dictionary_Site.xlsx'))
 #data_MSSL_MSW <- format_biweekly_paycycle(data_MSSL_MSW)
 
 # Lookup Jobcodes ---------------------------------------------------------
+data_MSSL_MSW <- data_MSSL_MSW %>%
+  mutate(`Position Code Description` = case_when(
+    is.na(`Position Code Description`) ~ "OTHER",
+    TRUE ~ `Position Code Description`))
 data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_jobcodes) 
 data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_jobcodes_MSBIB)
 data_MSSL_MSW <- data_MSSL_MSW %>%
