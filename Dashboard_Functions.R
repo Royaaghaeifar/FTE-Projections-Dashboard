@@ -19,6 +19,7 @@ worked_paycodes <- c('REGULAR','OVERTIME','OTHER_WORKED','EDUCATION','ORIENTATIO
 pre_covid_PP <- as.Date(c('2020-01-04','2020-01-18','2020-02-01','2020-02-15','2020-02-29'))
 #get unique service lines
 service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+nursing_service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU")
 report_period_length <- 3
 biweekly_fte <- 75
 digits_round <- 2
@@ -105,6 +106,27 @@ MountSinai_pal <- function(palette = "main", reverse = FALSE, ...) {
   colorRampPalette(pal, ...)
 }
 
+#Dashboard Outputs
+#Graph styling
+graph_style <- function(graph,hosp=NULL,service=NULL,level="DEFINITION.CODE"){
+  title <- trimws(paste(hosp,service))
+  graph <- graph+
+    geom_line(size=1.5)+
+    geom_point(size=2.75)+
+    ggtitle(paste(title,"FTE's By Pay Period"))+
+    xlab("Pay Period")+
+    ylab("FTE (Full Time Equivalent)")+
+    scale_color_manual(values=MountSinai_pal("main")(nrow(unique(data_service[,level]))))+
+    theme(plot.title=element_text(hjust=.5,size=20),
+          axis.title = element_text(face="bold"),
+          legend.text=element_text(size = 6)) #create and style service line graph
+  graphly <- ggplotly(graph,tooltip=c("group","x","y")) %>%
+    config(displaylogo = F,
+           modeBarButtonsToRemove = c("lasso2d","autoScale2d","select2d","toggleSpikelines")) %>%
+    layout(title = list(xanchor = "center")) #turn graph into plotly interactive
+  return(graphly)
+}
+
 #Site Level Service Line Graphs
 service_line <- function(hosp,service){
   library(tidyr)
@@ -126,21 +148,11 @@ service_line <- function(hosp,service){
       DATES = as.factor(PP.END.DATE),
       FTE = round(FTE,digits_round)) #turn dates into factor
   data_service$DATES <- factor(data_service$DATES)
-  service_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=DEPARTMENT,color=DEPARTMENT))+
-    geom_line(size=1.5)+
-    geom_point(size=2.75)+
-    ggtitle(paste(hosp,service,"FTE's By Pay Period"))+
-    xlab("Pay Period")+
-    ylab("FTE (Full Time Equivalent)")+
-    scale_color_manual(values=MountSinai_pal("main")(length(unique(data_service$DEFINITION.CODE))))+
-    theme(plot.title=element_text(hjust=.5,size=20),
-          axis.title = element_text(face="bold"),
-          legend.text=element_text(size = 6)) #create and style service line graph
-  service_line_graphly <- ggplotly(service_line_graph,tooltip=c("group","x","y")) %>%
-    config(displaylogo = F,
-           modeBarButtonsToRemove = c("lasso2d","autoScale2d","select2d","toggleSpikelines")) %>%
-    layout(title = list(xanchor = "center")) #turn graph into plotly interactive
-  return(service_line_graphly)
+  data_service <<- data_service
+  service_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=DEPARTMENT,color=DEPARTMENT))
+  hosp <- hosp
+  service <- service
+  graph_style(graph = service_line_graph,hosp = hosp,service = service)
 }
 
 #Site level Kable
@@ -174,21 +186,21 @@ k <- function(hosp,service){
 premier_sum_stats <- function(sys.sum, site, serv.line){
   data_export <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE) %>%
+    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE, DATES) %>%
     filter(PAYROLL == site,
-           SERVICE.LINE == serv.line) %>%
-    group_by(PAYROLL,SERVICE.LINE,PP.END.DATE) %>%
+           SERVICE.LINE %in% serv.line) %>%
+    group_by(PAYROLL,PP.END.DATE, DATES) %>%
     summarise(FTE = sum(FTE, na.rm = T)) %>%
-    pivot_wider(id_cols = c(PAYROLL,SERVICE.LINE),
-                names_from = PP.END.DATE,
+    pivot_wider(id_cols = PAYROLL,
+                names_from = DATES,
                 values_from = FTE) %>%
     ungroup() %>%
     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
   data_export$`Reporting Period Avg.` <- apply(data_export[,(ncol(data_export)-2):ncol(data_export)],1,mean)
   data_export$`Baseline Avg.` <- rowMeans(subset(data_export, select = c("2020-01-04","2020-01-18","2020-02-01","2020-02-15","2020-02-29"), na.rm = TRUE))
-  data_export <- data_export[,c(1:2,(ncol(data_export)-9):ncol(data_export))]
-  data_export[,(ncol(data_export)-9):ncol(data_export)] <- round(data_export[,(ncol(data_export)-9):ncol(data_export)],digits_round)
-  colnames(data_export)[1:2] <- c('Site', 'Service Line')
+  data_export <- data_export[,c(1,(ncol(data_export)-10):ncol(data_export))]
+  data_export[,(ncol(data_export)-10):ncol(data_export)] <- round(data_export[,(ncol(data_export)-10):ncol(data_export)],digits_round)
+  colnames(data_export)[1] <- c('Site')
   data_final <- data_export
   return(data_final)
 }
@@ -203,7 +215,7 @@ system_kable <- function(table){
 
 #System level service line graph
 graph_data <- function(serv.line){
-  data_export <- data %>% 
+  data_service <- data %>% 
     ungroup() %>%
     select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
     filter(SERVICE.LINE == serv.line) %>%
@@ -211,19 +223,63 @@ graph_data <- function(serv.line){
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
-  system_line_graph <- ggplot(data = data_export, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))+
+  data_service <<- data_service
+  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
+  service <- serv.line
+  graph_style(graph = system_line_graph,service = service,level="PAYROLL")
+}
+
+#Site level total fte
+site_total <- function(){
+  data_service <- data %>% 
+    ungroup() %>%
+    select(PAYROLL,FTE,PP.END.DATE,DATES) %>%
+    group_by(PAYROLL,PP.END.DATE,DATES) %>%
+    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+    ungroup() %>%
+    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+  data_service <<- data_service
+  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
+  graph_style(graph = system_line_graph,service = "Total",level="PAYROLL")
+}
+
+#Nursing total FTE
+nursing_total <- function(nursing){
+  data_service <- data %>% 
+    ungroup() %>%
+    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(SERVICE.LINE %in% nursing) %>%
+    group_by(PAYROLL,PP.END.DATE,DATES) %>%
+    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+    ungroup() %>%
+    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+  data_service <<- data_service
+  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
+  graph_style(graph = system_line_graph,service = "Total Nursing",level="PAYROLL")
+}
+
+#System total FTE
+system_total <- function(){
+  data_service <- data %>% 
+    ungroup() %>%
+    select(FTE,PP.END.DATE,DATES) %>%
+    group_by(PP.END.DATE,DATES) %>%
+    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+    ungroup() 
+  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=1,color="#5cd3ff"))+
     geom_line(size=1.5)+
     geom_point(size=2.75)+
-    ggtitle(paste(serv.line,"FTE's By Pay Period"))+
+    ggtitle("MSHS FTE's By Pay Period")+
     xlab("Pay Period")+
     ylab("FTE (Full Time Equivalent)")+
-    scale_color_manual(values=MountSinai_pal("main")(length(unique(data_export$PAYROLL))))+
+    scale_color_manual(values=MountSinai_pal("main")(1))+
     theme(plot.title=element_text(hjust=.5,size=20),
           axis.title = element_text(face="bold"),
-          legend.text=element_text(size = 6)) #create and style service line graph
+          legend.position = "none") #create and style service line graph
   system_line_graphly <- ggplotly(system_line_graph,tooltip=c("group","x","y")) %>%
     config(displaylogo = F,
            modeBarButtonsToRemove = c("lasso2d","autoScale2d","select2d","toggleSpikelines")) %>%
     layout(title = list(xanchor = "center")) #turn graph into plotly interactive
   return(system_line_graphly)
 }
+
