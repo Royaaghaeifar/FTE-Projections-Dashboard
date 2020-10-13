@@ -5,13 +5,13 @@ date: '`r Sys.Date()`'
 output: 
   html_document:
     toc: true
-    toc_depth: 3
+    toc_depth: 4
     toc_float: true
 ---
 
 <style type="text/css">
 div.main-container {
-  max-width: 1780px;
+  max-width: 1760px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -23,7 +23,35 @@ source("Dashboard_Functions.R")
 #### Reporting Period: `r rep`
 #### Baseline Period: 12/22/2020 to 02/29/2020
 ## Mount Sinai Health System
-### `r service_lines[[1]]`
+### MSHS FTE Trend
+```{r, echo=F,warning=F,message=F,fig.width=11}
+system_total()
+```
+```{r, echo=F,warning=F,message=F}
+system_table <- lapply(site_list, function(x) premier_sum_stats(data, x,service_lines))
+system_table <- do.call(rbind, system_table) %>% arrange(Site)
+system_table <- system_table %>% mutate(Site = "MSHS")  %>% ungroup() %>% group_by(Site) %>% summarise_at(vars(-group_cols()), sum)
+system_kable(system_table)
+```
+### Site Comparison
+```{r, echo=F,warning=F,message=F,fig.width=12}
+site_total()
+```
+```{r, echo=F,warning=F,message=F}
+site_table <- lapply(site_list, function(x) premier_sum_stats(data, x,service_lines))
+site_table <- do.call(rbind, site_table) %>% arrange(Site)
+system_kable(site_table)
+```
+### Nursing Comparison
+```{r, echo=F,warning=F,message=F,fig.width=12}
+nursing_total(nursing_service_lines)
+```
+```{r, echo=F,warning=F,message=F}
+nursing_table <- lapply(site_list, function(x) premier_sum_stats(data, x,nursing_service_lines))
+Service_Line_nursing <- do.call(rbind, nursing_table) %>% arrange(Site)
+system_kable(Service_Line_nursing)
+```
+#### `r service_lines[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 graph_data(service_lines[[1]])
 ```
@@ -32,7 +60,7 @@ Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[
 Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
 system_kable(Service_Line_table2)
 ```
-### `r service_lines[[2]]`
+#### `r service_lines[[2]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 graph_data(service_lines[[2]])
 ```
@@ -41,7 +69,7 @@ Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[
 Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
 system_kable(Service_Line_table2)
 ```
-### `r service_lines[[3]]`
+#### `r service_lines[[3]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 graph_data(service_lines[[3]])
 ```
@@ -50,7 +78,7 @@ Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[
 Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
 system_kable(Service_Line_table2)
 ```
-### `r service_lines[[4]]`
+#### `r service_lines[[4]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 graph_data(service_lines[[4]])
 ```
@@ -59,7 +87,7 @@ Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[
 Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
 system_kable(Service_Line_table2)
 ```
-### `r service_lines[[5]]`
+#### `r service_lines[[5]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 graph_data(service_lines[[5]])
 ```
@@ -68,7 +96,7 @@ Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[
 Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
 system_kable(Service_Line_table2)
 ```
-### `r service_lines[[6]]`
+#### `r service_lines[[6]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 graph_data(service_lines[[6]])
 ```
@@ -77,7 +105,7 @@ Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[
 Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
 system_kable(Service_Line_table2)
 ```
-### `r service_lines[[7]]`
+#### `r service_lines[[7]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 graph_data(service_lines[[7]])
 ```
