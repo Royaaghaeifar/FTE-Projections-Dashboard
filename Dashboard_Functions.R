@@ -137,7 +137,7 @@ service_line <- function(hosp,service){
     pivot_wider(id_cols = c("DEFINITION.CODE","DEFINITION.NAME","DEPARTMENT"),
                 names_from = "PP.END.DATE",
                 values_from = FTE) #pivot dataframe to bring in NAs for missing PP
-  data_service <- data_service[,c(1:3,(ncol(data_service)-7):ncol(data_service))]
+  data_service <- data_service[,c(1:3,(ncol(data_service)-9):ncol(data_service))]
   data_service <- data_service %>% 
     pivot_longer(cols = 4:ncol(data_service),
                  names_to = "PP.END.DATE")#pivot dataframe to original form
@@ -146,7 +146,7 @@ service_line <- function(hosp,service){
       is.na(value) ~ 0, #if FTE is NA -> 0
       !is.na(value) ~ value), #else leave the value
       DATES = as.factor(PP.END.DATE),
-      FTE = round(FTE,digits_round)) #turn dates into factor
+      FTE = round(value,digits_round)) #turn dates into factor
   data_service$DATES <- factor(data_service$DATES)
   data_service <<- data_service
   service_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=DEPARTMENT,color=DEPARTMENT))
@@ -223,6 +223,17 @@ graph_data <- function(serv.line){
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+  data_service <- data_service %>% 
+    pivot_wider(id_cols=c(PAYROLL,SERVICE.LINE),names_from = DATES,values_from = FTE)
+  data_service <- data_service[,c(1,2,(ncol(data_service)-9):ncol(data_service))]
+  data_service <- data_service %>% 
+    pivot_longer(cols = 3:ncol(data_service),
+                 names_to = "DATES")
+  data_service <- data_service %>% 
+    mutate(FTE = case_when(
+      is.na(value) ~ 0, #if FTE is NA -> 0
+      !is.na(value) ~ value), #else leave the value
+      FTE = round(value,digits_round))
   data_service <<- data_service
   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
   service <- serv.line
@@ -238,6 +249,17 @@ site_total <- function(){
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+  data_service <- data_service %>% 
+    pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
+  data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
+  data_service <- data_service %>% 
+    pivot_longer(cols = 2:ncol(data_service),
+                 names_to = "DATES")
+  data_service <- data_service %>% 
+    mutate(FTE = case_when(
+      is.na(value) ~ 0, #if FTE is NA -> 0
+      !is.na(value) ~ value), #else leave the value
+      FTE = round(value,digits_round))
   data_service <<- data_service
   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
   graph_style(graph = system_line_graph,service = "Total",level="PAYROLL")
@@ -253,6 +275,17 @@ nursing_total <- function(nursing){
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+  data_service <- data_service %>% 
+    pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
+  data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
+  data_service <- data_service %>% 
+    pivot_longer(cols = 2:ncol(data_service),
+                 names_to = "DATES")
+  data_service <- data_service %>% 
+    mutate(FTE = case_when(
+      is.na(value) ~ 0, #if FTE is NA -> 0
+      !is.na(value) ~ value), #else leave the value
+      FTE = round(value,digits_round))
   data_service <<- data_service
   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
   graph_style(graph = system_line_graph,service = "Total Nursing",level="PAYROLL")
@@ -265,7 +298,8 @@ system_total <- function(){
     select(FTE,PP.END.DATE,DATES) %>%
     group_by(PP.END.DATE,DATES) %>%
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
-    ungroup() 
+    ungroup()
+  data_service <- data_service[(nrow(data_service)-9):nrow(data_service),]
   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=1,color="#5cd3ff"))+
     geom_line(size=1.5)+
     geom_point(size=2.75)+
