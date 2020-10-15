@@ -161,16 +161,15 @@ k <- function(hosp,service){
   kdata <- data %>% 
     filter(PAYROLL == hosp, 
            SERVICE.LINE == service) %>% 
-    pivot_wider(id_cols = c(SERVICE.LINE,DEPARTMENT),
+    pivot_wider(id_cols = DEPARTMENT,
                 names_from = DATES,
                 values_from = FTE) 
   kdata[is.na(kdata)] <- 0 
-  colnames(kdata)[1] <- "SERVICE LINE" 
   sort <- colnames(kdata)[ncol(kdata)] 
   kdata <- kdata %>% ungroup() %>% arrange(desc(!!sym(sort))) 
   kdata$`Reporting Period Avg.` <- apply(kdata[,(ncol(kdata)-2):ncol(kdata)],1,mean)
   kdata$`Baseline Avg.` <- rowMeans(subset(kdata, select = c("2020-01-04","2020-01-18","2020-02-01","2020-02-15","2020-02-29"), na.rm = TRUE))
-  kdata <- kdata[,c(1:2,(ncol(kdata)-9):ncol(kdata))]
+  kdata <- kdata[,c(1,(ncol(kdata)-10):ncol(kdata))]
   kdata[,(ncol(kdata)-9):ncol(kdata)] <- round(kdata[,(ncol(kdata)-9):ncol(kdata)],digits_round)
   Ktable <- kdata 
   kable(Ktable) %>%
