@@ -1,7 +1,7 @@
 ---
 title: MSHS FTE Dashboard
 author: Health System Operations
-date: '`r Sys.Date()`'
+date: 'Publish Date: `r Sys.Date()`'
 output: 
   html_document:
     toc: true
