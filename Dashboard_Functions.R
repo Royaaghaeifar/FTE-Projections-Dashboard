@@ -170,7 +170,7 @@ k <- function(hosp,service){
   kdata$`Reporting Period Avg.` <- apply(kdata[,(ncol(kdata)-2):ncol(kdata)],1,mean)
   kdata$`Baseline Avg.` <- rowMeans(subset(kdata, select = c("2020-01-04","2020-01-18","2020-02-01","2020-02-15","2020-02-29"), na.rm = TRUE))
   kdata <- kdata[,c(1,(ncol(kdata)-10):ncol(kdata))]
-  kdata[,(ncol(kdata)-9):ncol(kdata)] <- round(kdata[,(ncol(kdata)-9):ncol(kdata)],digits_round)
+  kdata[,(ncol(kdata)-10):ncol(kdata)] <- round(kdata[,(ncol(kdata)-10):ncol(kdata)],digits_round)
   Ktable <- kdata 
   kable(Ktable) %>%
     kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>%
