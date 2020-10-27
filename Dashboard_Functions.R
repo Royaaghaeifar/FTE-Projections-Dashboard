@@ -232,11 +232,12 @@ graph_data <- function(serv.line){
     mutate(FTE = case_when(
       is.na(value) ~ 0, #if FTE is NA -> 0
       !is.na(value) ~ value), #else leave the value
-      FTE = round(value,digits_round))
+      FTE = round(value,digits_round)) %>%
+    rename(Site = PAYROLL)
   data_service <<- data_service
-  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
+  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
   service <- serv.line
-  graph_style(graph = system_line_graph,service = service,level="PAYROLL")
+  graph_style(graph = system_line_graph,service = service,level="Site")
 }
 
 #Site level total fte
@@ -258,10 +259,11 @@ site_total <- function(){
     mutate(FTE = case_when(
       is.na(value) ~ 0, #if FTE is NA -> 0
       !is.na(value) ~ value), #else leave the value
-      FTE = round(value,digits_round))
+      FTE = round(value,digits_round)) %>%
+    rename(Site = PAYROLL)
   data_service <<- data_service
-  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
-  graph_style(graph = system_line_graph,service = "Total",level="PAYROLL")
+  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
+  graph_style(graph = system_line_graph,service = "Total",level="Site")
 }
 
 #Nursing total FTE
@@ -284,10 +286,11 @@ nursing_total <- function(nursing){
     mutate(FTE = case_when(
       is.na(value) ~ 0, #if FTE is NA -> 0
       !is.na(value) ~ value), #else leave the value
-      FTE = round(value,digits_round))
+      FTE = round(value,digits_round)) %>%
+    rename(Site = PAYROLL)
   data_service <<- data_service
-  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=PAYROLL,color=PAYROLL))
-  graph_style(graph = system_line_graph,service = "Total Nursing",level="PAYROLL")
+  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
+  graph_style(graph = system_line_graph,service = "Total Nursing",level="Site")
 }
 
 #System total FTE
