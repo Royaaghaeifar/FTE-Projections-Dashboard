@@ -318,4 +318,3 @@ system_total <- function(){
     layout(title = list(xanchor = "center")) #turn graph into plotly interactive
   return(system_line_graphly)
 }
-
