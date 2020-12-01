@@ -18,8 +18,11 @@ worked_paycodes <- c('REGULAR','OVERTIME','OTHER_WORKED','EDUCATION','ORIENTATIO
 #pre covid pay period end dates
 pre_covid_PP <- as.Date(c('2020-01-04','2020-01-18','2020-02-01','2020-02-15','2020-02-29'))
 #get unique service lines
-service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+#service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Services Admin","Pharmacy","Radiology","Lab","Emergency Department","Other")
 nursing_service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU")
+corporate_service_lines <- list("IT","HR","CMO")
+supportservices_service_lines <- list("Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Services Admin")
 report_period_length <- 3
 biweekly_fte <- 75
 digits_round <- 2
@@ -292,6 +295,32 @@ nursing_total <- function(nursing){
   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
   graph_style(graph = system_line_graph,service = "Total Nursing",level="Site")
 }
+#Support Services FTE
+support_total <- function(support){
+  data_service <- data %>% 
+    ungroup() %>%
+    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(SERVICE.LINE %in% support) %>%
+    group_by(PAYROLL,PP.END.DATE,DATES) %>%
+    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+    ungroup() %>%
+    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+  data_service <- data_service %>% 
+    pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
+  data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
+  data_service <- data_service %>% 
+    pivot_longer(cols = 2:ncol(data_service),
+                 names_to = "DATES")
+  data_service <- data_service %>% 
+    mutate(FTE = case_when(
+      is.na(value) ~ 0, #if FTE is NA -> 0
+      !is.na(value) ~ value), #else leave the value
+      FTE = round(value,digits_round)) %>%
+    rename(Site = PAYROLL)
+  data_service <<- data_service
+  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
+  graph_style(graph = system_line_graph,service = "Total Support Services",level="Site")
+}
 
 #System total FTE
 system_total <- function(){
@@ -317,4 +346,21 @@ system_total <- function(){
            modeBarButtonsToRemove = c("lasso2d","autoScale2d","select2d","toggleSpikelines")) %>%
     layout(title = list(xanchor = "center")) #turn graph into plotly interactive
   return(system_line_graphly)
+}
+
+#Corporate Deparmental FTE
+corporate <- function(service){
+  library(tidyr)
+  data_service <- data %>% #take pre-filtered data
+    filter(SERVICE.LINE == service) %>% #filter on specific service line
+    ungroup() %>%
+    select(SERVICE.LINE,PP.END.DATE,FTE,DATES) %>%
+    arrange(PP.END.DATE) %>%
+    rename(DEPARTMENT = SERVICE.LINE)
+  data_service <- data_service[(nrow(data_service)-9):nrow(data_service),]
+  data_service$DATES <- factor(data_service$DATES)
+  data_service <<- data_service
+  corporate_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=DEPARTMENT,color=DEPARTMENT))
+  service <- service
+  graph_style(graph = corporate_graph,service = service,level = "DEPARTMENT")
 }
