@@ -19,21 +19,21 @@ worked_paycodes <- c('REGULAR','OVERTIME','OTHER_WORKED','EDUCATION','ORIENTATIO
 pre_covid_PP <- as.Date(c('2020-01-04','2020-01-18','2020-02-01','2020-02-15','2020-02-29'))
 #get unique service lines
 #service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
-service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin","Pharmacy","Radiology","Lab","Emergency Department","Other")
+service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin","Pharmacy","Radiology","Lab","Emergency Department","Other")
 nursing_service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU")
 corporate_service_lines <- list("IT","HR","CMO")
-supportservices_service_lines <- list("Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin")
+supportservices_service_lines <- list("Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin")
 report_period_length <- 3
 biweekly_fte <- 75
 digits_round <- 2
 
 #Site Based Service List
-MSH_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin","Pharmacy","Radiology","Lab","Emergency Department","Other")
-MSQ_service_list <- list("ICU","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Linen","HIM","Pharmacy","Radiology","Emergency Department","Other")
-MSBI_service_list <- list("ICU","Progressive","Med/Surg","Psych","RETU","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Linen","HIM","Mail","Pharmacy","Radiology","Emergency Department","Other")
-MSB_service_list <- list("ICU","Progressive","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
-MSW_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Rehab","Linen","Mail","Pharmacy","Radiology","Lab","Emergency Department","Other")
-MSM_service_list <- list("ICU","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Mail","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSH_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSQ_service_list <- list("ICU","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Security","Linen","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSBI_service_list <- list("ICU","Progressive","Med/Surg","Psych","RETU","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Linen","HIM","Mail","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSB_service_list <- list("ICU","Progressive","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSW_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","Mail","Misc Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+MSM_service_list <- list("ICU","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Mail","Misc Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
 site_list <- list("MSH","MSQ","MSBI","MSB","MSW","MSM")
 
 #Pre filter data 
@@ -257,7 +257,7 @@ site_total <- function(){
     group_by(PAYROLL,PP.END.DATE,DATES) %>%
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
-    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM","Corporate")))
   data_service <- data_service %>% 
     pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
   data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
