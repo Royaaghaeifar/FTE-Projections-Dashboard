@@ -300,18 +300,33 @@ system_kable(Service_Line_table2)
 corporate(service = corporate_service_lines[[1]])
 ```
 ```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == corporate_service_lines[[1]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, corporate_service_lines[[1]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2)
+Service_Line_table2[,1] <- "CORPORATE"
+colnames(Service_Line_table2)[1] <- "DEPARTMENT"
+system_kable(Service_Line_table2)
 ```
 ### `r corporate_service_lines[[2]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 corporate(service = corporate_service_lines[[2]])
 ```
 ```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == corporate_service_lines[[2]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, corporate_service_lines[[2]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2)
+Service_Line_table2[,1] <- "CORPORATE"
+colnames(Service_Line_table2)[1] <- "DEPARTMENT"
+system_kable(Service_Line_table2)
 ```
 ### `r corporate_service_lines[[3]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
 corporate(service = corporate_service_lines[[3]])
 ```
 ```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == corporate_service_lines[[3]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, corporate_service_lines[[3]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2)
+Service_Line_table2[,1] <- "CORPORATE"
+colnames(Service_Line_table2)[1] <- "DEPARTMENT"
+system_kable(Service_Line_table2)
 ```
 ## `r site_list[[1]]`
 ### `r MSH_service_list[[1]]`
@@ -736,6 +751,13 @@ service_line(hosp = site_list[[3]], service = MSBI_service_list[[19]])
 ```{r, echo=F,warning=F,message=F}
 k(hosp = site_list[[3]], service = MSBI_service_list[[19]])
 ```
+### `r MSBI_service_list[[20]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[20]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[20]])
+```
 ## `r site_list[[4]]`
 ### `r MSB_service_list[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
@@ -997,6 +1019,13 @@ service_line(hosp = site_list[[5]], service = MSW_service_list[[21]])
 ```{r, echo=F,warning=F,message=F}
 k(hosp = site_list[[5]], service = MSW_service_list[[21]])
 ```
+### `r MSW_service_list[[22]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[22]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[22]])
+```
 ## `r site_list[[6]]`
 ### `r MSM_service_list[[1]]`
 ```{r, echo=F,warning=F,message=F,fig.width=12}
@@ -1130,4 +1159,11 @@ service_line(hosp = site_list[[6]], service = MSM_service_list[[20]])
 ```
 ```{r, echo=F,warning=F,message=F}
 k(hosp = site_list[[6]], service = MSM_service_list[[20]])
+```
+### `r MSM_service_list[[21]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[21]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[21]])
 ```
