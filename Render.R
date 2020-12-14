@@ -1,5 +1,6 @@
 #FTE Dashboard Render
 library(rmarkdown)
+library(here)
 
 #Source system summary to update the system_summary.rds
 ###Check error report for any mapping issues###########
@@ -12,3 +13,8 @@ saveRDS(System_Summary,file="J:/deans/Presidents/SixSigma/MSHS Productivity/Prod
 end <- "10/24/2020"
 #render FTE Trend Dashboard
 render("FTE_Trend_Dashboard.rmd")
+
+#Archive the FTE Trend Dashboard with date of max pay period
+file.copy(paste0(here(),"/FTE_Trend_Dashboard.html"),"J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards")
+file.rename("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard.html",
+            paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard_",as.Date(end,format="%m/%d/%Y"),".html"))
