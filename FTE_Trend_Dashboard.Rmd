@@ -1,5 +1,5 @@
 ---
-title: MSHS FTE Dashboard
+title: MSHS Worked FTE Dashboard
 author: Health System Operations
 date: 'Publish Date: `r Sys.Date()`'
 output: 
@@ -22,6 +22,8 @@ source("Dashboard_Functions.R")
 ```
 #### Reporting Period: `r rep`
 #### Baseline Period: 12/22/2020 to 02/29/2020
+#### Departments with an * do not currently have a Premier productivity report
+#### 1 FTE = 37.5 Worked Hours
 ## Mount Sinai Health System
 ### MSHS FTE Trend
 ```{r, echo=F,warning=F,message=F,fig.width=11}

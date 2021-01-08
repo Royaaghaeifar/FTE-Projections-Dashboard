@@ -122,7 +122,7 @@ graph_style <- function(graph,hosp=NULL,service=NULL,level="DEFINITION.CODE"){
   graph <- graph+
     geom_line(size=1.5)+
     geom_point(size=2.75)+
-    ggtitle(paste(title,"FTE's By Pay Period"))+
+    ggtitle(paste(title,"Worked FTE's By Pay Period"))+
     xlab("Pay Period")+
     ylab("FTE (Full Time Equivalent)")+
     scale_color_manual(values=MountSinai_pal("main")(nrow(unique(data_service[,level]))))+
@@ -340,7 +340,7 @@ system_total <- function(){
   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=1,color="#5cd3ff"))+
     geom_line(size=1.5)+
     geom_point(size=2.75)+
-    ggtitle("MSHS FTE's By Pay Period")+
+    ggtitle("MSHS Worked FTE's By Pay Period")+
     xlab("Pay Period")+
     ylab("FTE (Full Time Equivalent)")+
     scale_color_manual(values=MountSinai_pal("main")(1))+
