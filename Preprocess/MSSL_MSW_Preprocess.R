@@ -1,12 +1,12 @@
-#dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement"
-setwd(dir)
+dir_reference <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement"
+
 
 # Load Libriaries ---------------------------------------------------------
 library(readxl)
 library(tidyverse)
 
 # Import Data -------------------------------------------------------------
-data_MSSL_MSW <- readRDS(paste0(dir,"/MSLW RAW/Data_MSSL_MSW.rds"))
+data_MSSL_MSW <- readRDS(paste0(dir_reference,"/MSLW RAW/Data_MSSL_MSW.rds"))
 
 ## Preprocess Data ------------------------------------------------------
 #data_MSSL_MSW <- data_MSSL_MSW %>% mutate(`START DATE` = paste0(substr(`START DATE`,1,2), "/", substr(`START DATE`,3,4), "/",substr(`START DATE`,5,8)),
@@ -15,9 +15,15 @@ data_MSSL_MSW <- readRDS(paste0(dir,"/MSLW RAW/Data_MSSL_MSW.rds"))
 #                                          `END DATE` = as.Date(`END DATE`, "%m/%d/%Y"))
 
 # Import References -------------------------------------------------------
-folder_references <- paste0(dir,"/MSLW Reference Tables")
-dict_paycycle_alt <- read_xlsx(paste0(folder_references, "/Dictionary_Alt Pay Cycles.xlsx"))
+folder_references <- paste0(dir_reference,"/MSLW Reference Tables")
+#dict_paycycle_alt <- read_xlsx(paste0(folder_references, "/Dictionary_Alt Pay Cycles.xlsx"))
 dict_jobcodes <- read_xlsx(paste0(folder_references, "/MSLW Job Codes.xlsx"))
+dict_jobcodes <- dict_jobcodes %>% distinct()
+dict_jobcodes_MSBIB <- read_xlsx(paste0(dir_reference, '/MSBIB Reference/MSBI Job Code Dictionary.xlsx'), sheet = "Dictionary")
+dict_jobcodes_MSBIB <- dict_jobcodes_MSBIB %>% 
+  select(`Job Description`, `Job code`) %>% 
+  rename(`Position Code Description` = `Job Description`,
+         J.C_MSBIB = `Job code`) %>% distinct()
 dict_COFTloc <- read_xlsx(paste0(folder_references, "/Dictionary_COFT.xlsx")) #this will be from matts excel file
 dict_site <- read_xlsx(paste0(folder_references, '/Dictionary_Site.xlsx'))
 
@@ -43,7 +49,17 @@ dict_site <- read_xlsx(paste0(folder_references, '/Dictionary_Site.xlsx'))
 #data_MSSL_MSW <- format_biweekly_paycycle(data_MSSL_MSW)
 
 # Lookup Jobcodes ---------------------------------------------------------
-data_MSSL_MSW <- merge.data.frame(data_MSSL_MSW, dict_jobcodes, all.x = T)
+data_MSSL_MSW <- data_MSSL_MSW %>%
+  mutate(`Position Code Description` = case_when(
+    is.na(`Position Code Description`) ~ "OTHER",
+    TRUE ~ `Position Code Description`))
+data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_jobcodes) 
+data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_jobcodes_MSBIB)
+data_MSSL_MSW <- data_MSSL_MSW %>%
+  mutate(J.C = case_when(
+    is.na(J.C) ~ J.C_MSBIB,
+    TRUE ~ J.C), 
+    J.C_MSBIB = NULL)
 
 # Lookup Location ---------------------------------------------------------
 data_MSSL_MSW <- merge.data.frame(data_MSSL_MSW, dict_COFTloc, by.x = "WD_COFT", by.y ="COFT" , all.x = T)
@@ -77,4 +93,4 @@ data_MSSL_MSW <- data_MSSL_MSW %>%
          PAY.CODE = as.character(PAY.CODE))
 
 # Clear Environment -------------------------------------------------------
-rm(folder_references, dict_COFTloc, dict_jobcodes, dict_paycycle_alt, dict_site, format_biweekly_paycycle)
+rm(folder_references, dict_COFTloc, dict_jobcodes, dict_site, dir_reference, dict_jobcodes_MSBIB)

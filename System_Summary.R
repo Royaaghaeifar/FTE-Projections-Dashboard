@@ -1,14 +1,11 @@
 
-dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-setwd(dir)
+direct <- getwd()
 
 ##Refresh Master#########################################################################
-setwd(paste0(dir,"Preprocess"))
-folder_preprocess <- paste0(dir,"Preprocess")
 #create list of preprocessed files
-preprocess <- list.files(path=folder_preprocess)
+preprocess <- list.files(path=paste0(direct,"/Preprocess"))
 #bring in functions to run preprocess scripts and summarize them
-source(paste0(dir,"Source_Summary_FTE Trend.R"))
+source("Source_Summary_FTE Trend.R")
 #Run source function
 System_Source <- lapply(preprocess,function(x)Source_Func(x))
 System_Preprocess <- list(MSH_MSQ = data_MSH_MSQ,MSBIB = data_MSBI_MSB,MSSLW = data_MSSL_MSW,MSH_MSQ_Oracle = data_MSH_MSQ_oracle)
@@ -16,12 +13,11 @@ System_Preprocess <- list(MSH_MSQ = data_MSH_MSQ,MSBIB = data_MSBI_MSB,MSSLW = d
 System_Summary_List <- lapply(System_Preprocess, function(x)Source_Summary(x))
 #bind all summary tables into system summary
 System_Summary = do.call("rbind",System_Summary_List)
-#Save System Summary table
-setwd("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary")
-saveRDS(System_Summary,file = "System_Summary.rds")
+#Create table of all rows that failed a mapping
+#Payroll, Jobcode, Jobcode description, Pay Code, Provider
+Error_Report <- filter(System_Summary,is.na(PAYROLL)|is.na(J.C)|is.na(J.C.DESCRIPTION)|is.na(PAY.CODE.MAPPING)|is.na(PROVIDER))
+#Save error report
+library(xlsx)
+write.xlsx(Error_Report,paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Error Reports/Error_Report_",Sys.Date(),".xlsx"))
 #########################################################################################
 
-##Reload Master##########################################################################
-setwd("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary")
-System_Summary <- readRDS("System_Summary.rds")
-#########################################################################################

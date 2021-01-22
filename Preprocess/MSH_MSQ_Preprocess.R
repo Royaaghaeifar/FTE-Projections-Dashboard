@@ -1,21 +1,19 @@
 library(tidyverse)
 
-dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-setwd(dir)
-data_MSH_MSQ <- readRDS("Reference Tables/data_MSH_MSQ.rds")
+data_MSH_MSQ <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/data_MSH_MSQ.rds")
 
 #Read COA for department names
-COA <- read.csv("Reference Tables/COA.csv",header = T, stringsAsFactors = F)
+COA <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",header = T, stringsAsFactors = F)
 
 #Read in job code descriptions
-JCdesc <- read.csv("Reference Tables/JCdesc.csv",header = T, stringsAsFactors = F)
+JCdesc <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/JCdesc.csv",header = T, stringsAsFactors = F)
 
 #bring in J.C description
 data_MSH_MSQ <- left_join(data_MSH_MSQ,JCdesc) 
 
 #bring in department description and Location
 data_MSH_MSQ <- left_join(data_MSH_MSQ,COA,by = c("DPT.WRKD" = "Column2")) %>%
-  select(c(1:17,19:22),)
+  select(1:21)
 colnames(data_MSH_MSQ)[20:21] <- c("LOCATION","DESCRIPTION")
 
 #Correct negative hours and expenses

@@ -1,0 +1,1171 @@
+---
+title: MSHS Worked FTE Dashboard
+author: Health System Operations
+date: 'Publish Date: `r Sys.Date()`'
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+---
+
+<style type="text/css">
+div.main-container {
+  max-width: 1760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+```{r, echo=F,warning=F,message=F,results='hide'}
+source("Dashboard_Functions.R")
+```
+#### Reporting Period: `r rep`
+#### Baseline Period: 12/22/2020 to 02/29/2020
+#### Departments with an * do not currently have a Premier productivity report
+#### 1 FTE = 37.5 Worked Hours
+## Mount Sinai Health System
+### MSHS FTE Trend
+```{r, echo=F,warning=F,message=F,fig.width=11}
+system_total()
+```
+```{r, echo=F,warning=F,message=F}
+system_table <- lapply(site_list, function(x) premier_sum_stats(data, x,service_lines))
+system_table <- do.call(rbind, system_table) %>% arrange(Site)
+system_table <- system_table %>% mutate(Site = "MSHS")  %>% ungroup() %>% group_by(Site) %>% summarise_at(vars(-group_cols()), sum)
+system_kable(system_table)
+```
+### Site Comparison
+```{r, echo=F,warning=F,message=F,fig.width=12}
+site_total()
+```
+```{r, echo=F,warning=F,message=F}
+site_table <- lapply(site_list, function(x) premier_sum_stats(data, x,service_lines))
+site_table <- do.call(rbind, site_table) %>% arrange(Site)
+system_kable(site_table)
+```
+### Nursing Comparison
+```{r, echo=F,warning=F,message=F,fig.width=12}
+nursing_total(nursing_service_lines)
+```
+```{r, echo=F,warning=F,message=F}
+nursing_table <- lapply(site_list, function(x) premier_sum_stats(data, x,nursing_service_lines))
+Service_Line_nursing <- do.call(rbind, nursing_table) %>% arrange(Site)
+system_kable(Service_Line_nursing)
+```
+#### `r service_lines[[1]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[1]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[1]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[1]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[2]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[2]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[2]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[2]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[3]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[3]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[3]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[3]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[4]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[4]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[4]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[4]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[5]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[5]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[5]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[5]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[6]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[6]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[6]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[6]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[7]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[7]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[7]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[7]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+### `r service_lines[[8]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[8]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[8]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[8]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+### Support Services
+```{r, echo=F,warning=F,message=F,fig.width=12}
+support_total(supportservices_service_lines)
+```
+```{r, echo=F,warning=F,message=F}
+service_table <- lapply(site_list, function(x) premier_sum_stats(data, x, supportservices_service_lines))
+Service_Line_supportservices <- do.call(rbind, service_table) %>% arrange(Site)
+system_kable(Service_Line_supportservices)
+```
+#### `r service_lines[[9]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[9]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[9]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[9]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[10]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[10]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[10]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[10]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[11]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[11]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[11]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[11]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[12]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[12]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[12]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[12]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[13]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[13]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[13]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[13]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[14]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[14]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[14]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[14]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[15]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[15]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[15]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[15]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[16]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[16]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[16]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[16]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[17]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[17]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[17]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[17]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[18]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[18]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[18]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[18]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[19]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[19]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[19]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[19]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[20]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[20]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[20]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[20]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+#### `r service_lines[[21]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[21]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[21]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[21]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+### `r service_lines[[22]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[22]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[22]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[22]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+### `r service_lines[[23]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[23]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[23]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[23]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+### `r service_lines[[24]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[24]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[24]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[24]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+### `r service_lines[[25]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[25]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[25]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[25]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+### `r service_lines[[26]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+graph_data(service_lines[[26]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == service_lines[[26]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, service_lines[[26]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2) %>% mutate(`Service Line` = NULL)%>% arrange(Site)
+system_kable(Service_Line_table2)
+```
+## Corporate
+### `r corporate_service_lines[[1]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+corporate(service = corporate_service_lines[[1]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == corporate_service_lines[[1]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, corporate_service_lines[[1]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2)
+Service_Line_table2[,1] <- "CORPORATE"
+colnames(Service_Line_table2)[1] <- "DEPARTMENT"
+system_kable(Service_Line_table2)
+```
+### `r corporate_service_lines[[2]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+corporate(service = corporate_service_lines[[2]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == corporate_service_lines[[2]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, corporate_service_lines[[2]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2)
+Service_Line_table2[,1] <- "CORPORATE"
+colnames(Service_Line_table2)[1] <- "DEPARTMENT"
+system_kable(Service_Line_table2)
+```
+### `r corporate_service_lines[[3]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+corporate(service = corporate_service_lines[[3]])
+```
+```{r, echo=F,warning=F,message=F}
+Service_Line_table2 <- lapply(unique(filter(data,SERVICE.LINE == corporate_service_lines[[3]])$PAYROLL), function(x) premier_sum_stats(System_Summary,x, corporate_service_lines[[3]]))
+Service_Line_table2 <- do.call(rbind, Service_Line_table2)
+Service_Line_table2[,1] <- "CORPORATE"
+colnames(Service_Line_table2)[1] <- "DEPARTMENT"
+system_kable(Service_Line_table2)
+```
+## `r site_list[[1]]`
+### `r MSH_service_list[[1]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[1]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[1]])
+```
+### `r MSH_service_list[[2]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[2]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[2]])
+```
+### `r MSH_service_list[[3]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[3]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[3]])
+```
+### `r MSH_service_list[[4]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[4]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[4]])
+```
+### `r MSH_service_list[[5]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[5]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[5]])
+```
+### `r MSH_service_list[[6]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[6]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[6]])
+```
+### `r MSH_service_list[[7]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[7]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[7]])
+```
+### `r MSH_service_list[[8]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[8]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[8]])
+```
+### `r MSH_service_list[[9]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[9]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[9]])
+```
+### `r MSH_service_list[[10]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[10]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[10]])
+```
+### `r MSH_service_list[[11]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[11]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[11]])
+```
+### `r MSH_service_list[[12]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[12]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[12]])
+```
+### `r MSH_service_list[[13]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[13]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[13]])
+```
+### `r MSH_service_list[[14]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[14]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[14]])
+```
+### `r MSH_service_list[[15]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[15]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[15]])
+```
+### `r MSH_service_list[[16]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[16]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[16]])
+```
+### `r MSH_service_list[[17]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[17]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[17]])
+```
+### `r MSH_service_list[[18]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[18]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[18]])
+```
+### `r MSH_service_list[[19]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[19]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[19]])
+```
+### `r MSH_service_list[[20]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[20]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[20]])
+```
+### `r MSH_service_list[[21]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[21]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[21]])
+```
+### `r MSH_service_list[[22]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[22]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[22]])
+```
+### `r MSH_service_list[[23]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[23]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[23]])
+```
+### `r MSH_service_list[[24]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[24]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[24]])
+```
+### `r MSH_service_list[[25]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[25]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[25]])
+```
+### `r MSH_service_list[[26]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[1]], service = MSH_service_list[[26]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[1]], service = MSH_service_list[[26]])
+```
+## `r site_list[[2]]`
+### `r MSQ_service_list[[1]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[1]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[1]])
+```
+### `r MSQ_service_list[[2]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[2]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[2]])
+```
+### `r MSQ_service_list[[3]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[3]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[3]])
+```
+### `r MSQ_service_list[[4]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[4]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[4]])
+```
+### `r MSQ_service_list[[5]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[5]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[5]])
+```
+### `r MSQ_service_list[[6]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[6]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[6]])
+```
+### `r MSQ_service_list[[7]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[7]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[7]])
+```
+### `r MSQ_service_list[[8]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[8]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[8]])
+```
+### `r MSQ_service_list[[9]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[9]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[9]])
+```
+### `r MSQ_service_list[[10]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[10]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[10]])
+```
+### `r MSQ_service_list[[11]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[11]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[11]])
+```
+### `r MSQ_service_list[[12]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[12]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[12]])
+```
+### `r MSQ_service_list[[13]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[13]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[13]])
+```
+### `r MSQ_service_list[[14]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[14]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[14]])
+```
+### `r MSQ_service_list[[15]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[2]], service = MSQ_service_list[[15]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[2]], service = MSQ_service_list[[15]])
+```
+## `r site_list[[3]]`
+### `r MSBI_service_list[[1]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[1]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[1]])
+```
+### `r MSBI_service_list[[2]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[2]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[2]])
+```
+### `r MSBI_service_list[[3]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[3]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[3]])
+```
+### `r MSBI_service_list[[4]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[4]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[4]])
+```
+### `r MSBI_service_list[[5]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[5]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[5]])
+```
+### `r MSBI_service_list[[6]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[6]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[6]])
+```
+### `r MSBI_service_list[[7]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[7]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[7]])
+```
+### `r MSBI_service_list[[8]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[8]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[8]])
+```
+### `r MSBI_service_list[[9]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[9]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[9]])
+```
+### `r MSBI_service_list[[10]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[10]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[10]])
+```
+### `r MSBI_service_list[[11]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[11]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[11]])
+```
+### `r MSBI_service_list[[12]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[12]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[12]])
+```
+### `r MSBI_service_list[[13]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[13]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[13]])
+```
+### `r MSBI_service_list[[14]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[14]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[14]])
+```
+### `r MSBI_service_list[[15]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[15]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[15]])
+```
+### `r MSBI_service_list[[16]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[16]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[16]])
+```
+### `r MSBI_service_list[[17]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[17]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[17]])
+```
+### `r MSBI_service_list[[18]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[18]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[18]])
+```
+### `r MSBI_service_list[[19]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[19]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[19]])
+```
+### `r MSBI_service_list[[20]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[3]], service = MSBI_service_list[[20]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[3]], service = MSBI_service_list[[20]])
+```
+## `r site_list[[4]]`
+### `r MSB_service_list[[1]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[1]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[1]])
+```
+### `r MSB_service_list[[2]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[2]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[2]])
+```
+### `r MSB_service_list[[3]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[3]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[3]])
+```
+### `r MSB_service_list[[4]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[4]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[4]])
+```
+### `r MSB_service_list[[5]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[5]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[5]])
+```
+### `r MSB_service_list[[6]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[6]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[6]])
+```
+### `r MSB_service_list[[7]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[7]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[7]])
+```
+### `r MSB_service_list[[8]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[8]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[8]])
+```
+### `r MSB_service_list[[9]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[9]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[9]])
+```
+### `r MSB_service_list[[10]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[10]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[10]])
+```
+### `r MSB_service_list[[11]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[11]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[11]])
+```
+### `r MSB_service_list[[12]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[12]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[12]])
+```
+### `r MSB_service_list[[13]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[13]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[13]])
+```
+### `r MSB_service_list[[14]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[14]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[14]])
+```
+### `r MSB_service_list[[15]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[15]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[15]])
+```
+### `r MSB_service_list[[16]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[4]], service = MSB_service_list[[16]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[4]], service = MSB_service_list[[16]])
+```
+## `r site_list[[5]]`
+### `r MSW_service_list[[1]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[1]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[1]])
+```
+### `r MSW_service_list[[2]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[2]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[2]])
+```
+### `r MSW_service_list[[3]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[3]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[3]])
+```
+### `r MSW_service_list[[4]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[4]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[4]])
+```
+### `r MSW_service_list[[5]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[5]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[5]])
+```
+### `r MSW_service_list[[6]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[6]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[6]])
+```
+### `r MSW_service_list[[7]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[7]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[7]])
+```
+### `r MSW_service_list[[8]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[8]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[8]])
+```
+### `r MSW_service_list[[9]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[9]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[9]])
+```
+### `r MSW_service_list[[10]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[10]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[10]])
+```
+### `r MSW_service_list[[11]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[11]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[11]])
+```
+### `r MSW_service_list[[12]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[12]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[12]])
+```
+### `r MSW_service_list[[13]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[13]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[13]])
+```
+### `r MSW_service_list[[14]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[14]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[14]])
+```
+### `r MSW_service_list[[15]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[15]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[15]])
+```
+### `r MSW_service_list[[16]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[16]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[16]])
+```
+### `r MSW_service_list[[17]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[17]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[17]])
+```
+### `r MSW_service_list[[18]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[18]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[18]])
+```
+### `r MSW_service_list[[19]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[19]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[19]])
+```
+### `r MSW_service_list[[20]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[20]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[20]])
+```
+### `r MSW_service_list[[21]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[21]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[21]])
+```
+### `r MSW_service_list[[22]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[5]], service = MSW_service_list[[22]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[5]], service = MSW_service_list[[22]])
+```
+## `r site_list[[6]]`
+### `r MSM_service_list[[1]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[1]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[1]])
+```
+### `r MSM_service_list[[2]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[2]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[2]])
+```
+### `r MSM_service_list[[3]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[3]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[3]])
+```
+### `r MSM_service_list[[4]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[4]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[4]])
+```
+### `r MSM_service_list[[5]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[5]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[5]])
+```
+### `r MSM_service_list[[6]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[6]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[6]])
+```
+### `r MSM_service_list[[7]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[7]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[7]])
+```
+### `r MSM_service_list[[8]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[8]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[8]])
+```
+### `r MSM_service_list[[9]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[9]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[9]])
+```
+### `r MSM_service_list[[10]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[10]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[10]])
+```
+### `r MSM_service_list[[11]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[11]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[11]])
+```
+### `r MSM_service_list[[12]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[12]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[12]])
+```
+### `r MSM_service_list[[13]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[13]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[13]])
+```
+### `r MSM_service_list[[14]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[14]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[14]])
+```
+### `r MSM_service_list[[15]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[15]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[15]])
+```
+### `r MSM_service_list[[17]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[17]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[17]])
+```
+### `r MSM_service_list[[18]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[18]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[18]])
+```
+### `r MSM_service_list[[19]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[19]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[19]])
+```
+### `r MSM_service_list[[20]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[20]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[20]])
+```
+### `r MSM_service_list[[21]]`
+```{r, echo=F,warning=F,message=F,fig.width=12}
+service_line(hosp = site_list[[6]], service = MSM_service_list[[21]])
+```
+```{r, echo=F,warning=F,message=F}
+k(hosp = site_list[[6]], service = MSM_service_list[[21]])
+```
