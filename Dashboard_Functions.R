@@ -203,7 +203,7 @@ premier_sum_stats <- function(sys.sum, site, serv.line){
                 names_from = DATES,
                 values_from = FTE) %>%
     ungroup() %>%
-    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM","Corporate")))
   data_export$`Reporting Period Avg.` <- apply(data_export[,(ncol(data_export)-2):ncol(data_export)],1,mean)
   data_export$`Baseline Avg.` <- rowMeans(subset(data_export, select = c("2020-01-04","2020-01-18","2020-02-01","2020-02-15","2020-02-29"), na.rm = TRUE))
   data_export <- data_export[,c(1,(ncol(data_export)-10):ncol(data_export))]
