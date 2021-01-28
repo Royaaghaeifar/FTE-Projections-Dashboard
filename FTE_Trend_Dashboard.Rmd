@@ -22,15 +22,15 @@ source("Dashboard_Functions.R")
 ```
 #### Reporting Period: `r rep`
 #### Baseline Period: 12/22/2020 to 02/29/2020
-#### Departments with an * do not currently have a Premier productivity report
-#### 1 FTE = 37.5 Worked Hours
+#### * Department does not currently have a Premier productivity report
+#### 1 FTE = 75 Worked Hours/Pay Period
 ## Mount Sinai Health System
 ### MSHS FTE Trend
 ```{r, echo=F,warning=F,message=F,fig.width=11}
 system_total()
 ```
 ```{r, echo=F,warning=F,message=F}
-system_table <- lapply(site_list, function(x) premier_sum_stats(data, x,service_lines))
+system_table <- lapply(c(site_list,"Corporate"), function(x) premier_sum_stats(data, x,serv.line = c(service_lines,corporate_service_lines)))
 system_table <- do.call(rbind, system_table) %>% arrange(Site)
 system_table <- system_table %>% mutate(Site = "MSHS")  %>% ungroup() %>% group_by(Site) %>% summarise_at(vars(-group_cols()), sum)
 system_kable(system_table)
@@ -40,7 +40,7 @@ system_kable(system_table)
 site_total()
 ```
 ```{r, echo=F,warning=F,message=F}
-site_table <- lapply(site_list, function(x) premier_sum_stats(data, x,service_lines))
+site_table <- lapply(c(site_list,"Corporate"), function(x) premier_sum_stats(data, x,serv.line = c(service_lines,corporate_service_lines)))
 site_table <- do.call(rbind, site_table) %>% arrange(Site)
 system_kable(site_table)
 ```
