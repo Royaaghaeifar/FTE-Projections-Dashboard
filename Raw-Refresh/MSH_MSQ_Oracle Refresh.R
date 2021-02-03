@@ -1,14 +1,11 @@
 library(dplyr)
 library(tidyr)
-
-dir <- "~/MSH-MSQ-Payroll/"
-setwd(dir)
+library(here)
 
 ##MSHQ##
 #List files from MSQ Raw folder
-PPend_list <- list("04/25/2020","05/23/2020","06/20/2020","08/01/2020","08/29/2020","09/26/2020","10/24/2020","11/21/2020")
-setwd(paste0(dir,"MSHQ Oracle/"))
-folderOracle <- paste0(dir,"MSHQ Oracle/")     
+PPend_list <- list("04/25/2020","05/23/2020","06/20/2020","08/01/2020","08/29/2020","09/26/2020","10/24/2020","11/21/2020","01/02/2021")
+folderOracle <- paste0(here(),"/Raw Data/MSHQ Oracle/")     
 Oracle_file_list <- list.files(path=folderOracle, pattern="*.txt")
 #Read files in MSQ Raw as csv
 ORACLElist = lapply(Oracle_file_list, function(x)read.csv(x, sep = "~", header=T, stringsAsFactors = F,colClasses = rep("character",32)))
