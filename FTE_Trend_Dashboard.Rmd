@@ -21,7 +21,7 @@ div.main-container {
 source("Dashboard_Functions.R")
 ```
 #### Reporting Period: `r rep`
-#### Baseline Period: 12/22/2020 to 02/29/2020
+#### Baseline Period: 12/22/2019 to 02/29/2020
 #### * Department does not currently have a Premier productivity report
 #### 1 FTE = 75 Worked Hours/Pay Period
 ## Mount Sinai Health System
