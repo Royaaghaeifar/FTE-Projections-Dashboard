@@ -16,6 +16,9 @@ for(i in 1:length(ORACLElist)){
   if(i == 1 | i == 11){
     ORACLElist[[i]] <- ORACLElist[[i]] %>%
       filter(as.Date(End.Date, format = "%m/%d/%Y") <= as.Date(PPend_list[[i]], format = "%m/%d/%Y"))
+  } else if(i == 2){
+    ORACLElist[[i]] <- ORACLElist[[i]] %>%
+      filter(as.Date(End.Date, format = "%m/%d/%Y") <= as.Date(PPend_list[[i]], format = "%m/%d/%Y"))
   } else {
     ORACLElist[[i]] <- ORACLElist[[i]] %>%
       filter(as.Date(End.Date, format = "%m/%d/%Y") <= as.Date(PPend_list[[i]], format = "%m/%d/%Y"),
