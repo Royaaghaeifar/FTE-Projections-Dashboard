@@ -45,6 +45,8 @@ na <- na %>%
 
 #Form final datafram
 data_MSH_MSQ <- rbind(filter(MSHQ,!is.na(PAYROLL)),na)
+data_MSH_MSQ <- data_MSH_MSQ %>%
+  filter(as.Date(END.DATE, format = "%m/%d/%Y") <= as.Date("03/21/2020", format = "%m/%d/%Y"))
 
 setwd("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables")
 saveRDS(data_MSH_MSQ,file = "data_MSH_MSQ.rds")
