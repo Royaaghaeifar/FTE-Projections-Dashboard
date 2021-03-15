@@ -1,13 +1,12 @@
-#dir <- "C:/Users/webera04/Desktop/Code Docs"
-dir <-  'J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement'
 
 # Load Libraries ----------------------------------------------------------
 library(readxl)
 library(xlsx)
 library(tidyverse)
+library(here)
 
 # Import Data -------------------------------------------------------------
-folder_data <- paste0(dir,"/MSLW RAW")
+folder_data <- paste0(here(),"/Raw Data/MSMW Legacy/")
 list_data_files <- list.files(folder_data, pattern = "xlsx$", full.names = T)
 read_xlsx_files <- function(filename){
   dat <- read_xlsx(filename, sheet= "Export Worksheet")
