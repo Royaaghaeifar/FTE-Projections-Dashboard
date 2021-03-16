@@ -25,7 +25,7 @@ data_RAW <- list_data %>%
          `END DATE` = paste0(substr(`END DATE`,1,2), "/", substr(`END DATE`,3,4), "/",substr(`END DATE`,5,8)),
          `END DATE` = as.Date(`END DATE`, "%m/%d/%Y"),
          `Start-End` = paste0(`START DATE`, "-", `END DATE`))
-#Filtering each file by dates uploaded into Premier, must update each refresh
+#Filtering each file by dates uploaded into Premier
 data_RAW_a <- data_RAW %>% 
   filter(Source == "MSSLW_JAN_DEC19 and JAN_APR20 (1).xlsx"| Source == "MSSLW_JAN_DEC19 and JAN_APR20 (2).xlsx",
          `END DATE` <= as.Date('2020-03-28'))
@@ -56,8 +56,8 @@ data_RAW_i <- data_RAW %>%
   filter(Source == 'FEMA_MSSLW_JAN2021.xlsx',
          `END DATE` >= as.Date('2020-12-31'),
          `END DATE` < as.Date('2021-02-07'))
-#Combining all the files together, must update each refresh
-data_final <- rbind(data_RAW_a, data_RAW_b, data_RAW_c, data_RAW_d,data_RAW_f,data_RAW_g)
+#Combining all the files together
+data_final <- rbind(data_RAW_a, data_RAW_b, data_RAW_c, data_RAW_d,data_RAW_f,data_RAW_g,data_RAW_h,data_RAW_i)
 data_final$`Start-End` <- data_final$Source <- NULL
 
 # Add Payroll Source ------------------------------------------------------
