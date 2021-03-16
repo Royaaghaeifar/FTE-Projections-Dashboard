@@ -6,7 +6,7 @@ library(tidyverse)
 library(here)
 
 # Import Data -------------------------------------------------------------
-folder_data <- paste0(here(),"/Raw Data/MSMW Legacy/")
+folder_data <- paste0(here(),"/Raw Data/MSMW Legacy/MSMW Legacy")
 list_data_files <- list.files(folder_data, pattern = "xlsx$", full.names = T)
 read_xlsx_files <- function(filename){
   dat <- read_xlsx(filename, sheet= "Export Worksheet")
@@ -52,6 +52,10 @@ data_RAW_h <- data_RAW %>%
   filter(Source == "FEMA_MSSLW_NOV_JAN_21.xlsx",
          `END DATE` >= as.Date('2020-11-28'),
          `END DATE` < as.Date('2020-12-31'))
+data_RAW_i <- data_RAW %>%
+  filter(Source == 'FEMA_MSSLW_JAN2021.xlsx',
+         `END DATE` >= as.Date('2020-12-31'),
+         `END DATE` < as.Date('2021-02-07'))
 #Combining all the files together, must update each refresh
 data_final <- rbind(data_RAW_a, data_RAW_b, data_RAW_c, data_RAW_d,data_RAW_f,data_RAW_g)
 data_final$`Start-End` <- data_final$Source <- NULL
