@@ -1,9 +1,9 @@
 
-direct <- getwd()
+library(here)
 
 ##Refresh Master#########################################################################
 #create list of preprocessed files
-preprocess <- list.files(path=paste0(direct,"/Preprocess"))
+preprocess <- list.files(path=paste0(here(),"/Preprocess"))
 #bring in functions to run preprocess scripts and summarize them
 source("Source_Summary_FTE Trend.R")
 #Run source function
