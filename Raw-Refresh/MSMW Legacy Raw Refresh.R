@@ -56,8 +56,12 @@ data_RAW_i <- data_RAW %>%
   filter(Source == 'FEMA_MSSLW_JAN2021.xlsx',
          `END DATE` >= as.Date('2020-12-31'),
          `END DATE` < as.Date('2021-02-07'))
+data_RAW_j <- data_RAW %>%
+  filter(Source == 'FEMA_MSSLW_FEB2021.xlsx',
+         `END DATE` >= as.Date('2021-02-08'),
+         `END DATE` < as.Date('2021-03-07'))
 #Combining all the files together
-data_final <- rbind(data_RAW_a, data_RAW_b, data_RAW_c, data_RAW_d,data_RAW_f,data_RAW_g,data_RAW_h,data_RAW_i)
+data_final <- rbind(data_RAW_a, data_RAW_b, data_RAW_c, data_RAW_d,data_RAW_f,data_RAW_g,data_RAW_h,data_RAW_i, data_RAW_j)
 data_final$`Start-End` <- data_final$Source <- NULL
 
 # Add Payroll Source ------------------------------------------------------
