@@ -4,11 +4,11 @@
 
 library(dplyr)
 library(readxl) # needed for import
+library(here)
 
 # home location for working directory folder
-dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-
-dir_raw <- paste0(dir, "MSBIB Raw/")
+dir <- here()
+dir_raw <- paste0(dir, "Raw Data/MSBIB Legacy/")
 
 # Inputs/Imports ----------------------------------------------------------
 
