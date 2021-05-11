@@ -8,7 +8,11 @@ library(here)
 
 # home location for working directory folder
 dir <- here()
+<<<<<<< HEAD
 dir_raw <- paste0(dir, "/Raw Data/MSBIB Legacy/")
+=======
+dir_raw <- paste0(dir, "Raw Data/MSBIB Legacy/")
+>>>>>>> 7db4494cf24636f959d4a56e5d57d9e59c25326c
 
 # Inputs/Imports ----------------------------------------------------------
 
