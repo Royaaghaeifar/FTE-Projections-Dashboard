@@ -14,7 +14,7 @@ dir_raw <- paste0(dir, "/Raw Data/MSBIB Legacy/")
 
 
 MSBIB_file_list <- list.files(path = dir_raw, pattern = "*.xlsx")
-MSBIB_file_list <- MSBIB_file_list[-grep("~", MSBIB_file_list, value = FALSE)]
+# MSBIB_file_list <- MSBIB_file_list[-grep("~", MSBIB_file_list, value = FALSE)]
 
 MSBIB_data_list <- lapply(
   MSBIB_file_list,
