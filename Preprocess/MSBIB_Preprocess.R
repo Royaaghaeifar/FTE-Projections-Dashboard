@@ -8,6 +8,11 @@ library(readxl)
 dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
 dir_ref <- paste0(dir, "MSBIB Reference/")
 
+univ_ref <- paste0(
+  "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/",
+  "Universal Mapping/"
+)
+
 data_MSBI_MSB <- readRDS(paste0(dir, "Reference Tables/data_MSBI_MSB.rds"))
 
 # Inputs/Imports ----------------------------------------------------------
@@ -24,11 +29,16 @@ loc_desc <- read_excel(
   paste0(dir_ref, "COFT Descriptions.xlsx"),
   sheet = "LOC_TABLE"
 )
+
+# jc_dict <- read_excel(
+#   paste0(dir_ref, "MSBI Job Code Dictionary.xlsx")
+# )
+# jc_dict_MSLW <- read_excel(paste0(dir, "MSLW Reference Tables/MSLW Job Codes.xlsx"))
+# jc_dict_MSLW <- jc_dict_MSLW %>% distinct()
+
 jc_dict <- read_excel(
-  paste0(dir_ref, "MSBI Job Code Dictionary.xlsx")
+  paste0(univ_ref, "MSHS_Jobcode_Mapping.xlsx")
 )
-jc_dict_MSLW <- read_excel(paste0(dir, "MSLW Reference Tables/MSLW Job Codes.xlsx"))
-jc_dict_MSLW <- jc_dict_MSLW %>% distinct()
 
 # Data Transformations ----------------------------------------------------
 
@@ -111,21 +121,32 @@ payroll_data_process <- payroll_data_process %>%
     is.na(`Position Code Description`) ~ "OTHER",
     TRUE ~ `Position Code Description`))
 
+# using a temp (_t) data frame for testing
 payroll_data_process <- merge(
-  payroll_data_process, select(jc_dict, "Job Description", "Job code"),
-  by.x = "Position Code Description", by.y = "Job Description",
+  payroll_data_process,
+  jc_dict %>%
+    filter(PAYROLL == "MSBIB") %>%
+    select("J.C.DESCRIPTION", "J.C"),
+  by.x = "Position Code Description", by.y = "J.C.DESCRIPTION",
   all.x = T, all.y = F
 )
+
+# using a temp (_t) data frame for testing
 payroll_data_process <- merge(
-  payroll_data_process, select(jc_dict_MSLW, "Position Code Description", 'J.C'),
-  by.x = 'Position Code Description', by.y = 'Position Code Description',
+  payroll_data_process,
+  jc_dict %>%
+    filter(PAYROLL == "MSMW") %>%
+    select("J.C.DESCRIPTION", "J.C"),
+  by.x = "Position Code Description", by.y = "J.C.DESCRIPTION",
   all.x = T, all.y = F
 )
+
+# using a temp (_t) data frame for testing
 payroll_data_process <- payroll_data_process %>%
-  mutate(`Job code` = case_when(
-    is.na(`Job code`) ~ J.C,
-    TRUE ~ `Job code`),
-    J.C = NULL)
+  mutate(J.C.x = case_when(
+    is.na(J.C.x) ~ J.C.y,
+    TRUE ~ J.C.x),
+    J.C.y = NULL)
 
 
 payroll_data_process <- payroll_data_process %>%
@@ -137,7 +158,7 @@ payroll_data_process <- payroll_data_process %>%
     END.DATE = "END DATE",
     HOURS = Hours,
     EXPENSE = Expense,
-    J.C = "Job code",
+    J.C = J.C.x,
     J.C.DESCRIPTION = "Position Code Description"
   )
 
