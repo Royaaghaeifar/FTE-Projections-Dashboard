@@ -145,7 +145,6 @@ payroll_data_process <- payroll_data_process %>%
     TRUE ~ J.C.x),
     J.C.y = NULL)
 
-
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     HOME.DESCRIPTION = "Department Name Home Dept",
