@@ -40,6 +40,8 @@ jc_dict <- read_excel(
   paste0(univ_ref, "MSHS_Jobcode_Mapping.xlsx")
 )
 
+jc_dict <- distinct_at(jc_dict, vars(c(PAYROLL, J.C.DESCRIPTION)), .keep_all = TRUE)
+
 # Data Transformations ----------------------------------------------------
 
 payroll_data_process <- data_MSBI_MSB
