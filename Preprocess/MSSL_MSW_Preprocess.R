@@ -1,8 +1,9 @@
 dir_reference <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
                         "/Productivity/Analysis/FEMA Reimbursement",
                         "/MSHS-FEMA-Reimbursement")
-dir_new <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
-                  "/Productivity/Analysis/FTE Projections Dashboard")
+dir_mapping <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
+                  "/Productivity/Universal Mapping")
+dir_data <- paste0("TBD")
 
 # Load Libriaries ---------------------------------------------------------
 library(readxl)
@@ -72,7 +73,7 @@ data_MSSL_MSW <- merge.data.frame(data_MSSL_MSW, dict_site,
 colnames(data_MSSL_MSW)[which("Site" == colnames(data_MSSL_MSW))] <- "WRKD.SITE"
 
 # Rename Columns ---------------------------------------------------
-data_MSSL_MSW_2 <- data_MSSL_MSW %>%
+data_MSSL_MSW <- data_MSSL_MSW %>%
   rename(HOURS = Hours,
          EXPENSE = Expense,
          WRKD.DESCRIPTION = `Department Name Worked Dept`,
