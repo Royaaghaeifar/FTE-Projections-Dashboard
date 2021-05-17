@@ -8,12 +8,6 @@ library(tidyverse)
 # Import Data -------------------------------------------------------------
 data_MSSL_MSW <- readRDS(paste0(dir_reference,"/MSLW RAW/Data_MSSL_MSW.rds"))
 
-## Preprocess Data ------------------------------------------------------
-#data_MSSL_MSW <- data_MSSL_MSW %>% mutate(`START DATE` = paste0(substr(`START DATE`,1,2), "/", substr(`START DATE`,3,4), "/",substr(`START DATE`,5,8)),
-#                                          `START DATE` = as.Date(`START DATE`, "%m/%d/%Y"),
-#                                          `END DATE` = paste0(substr(`END DATE`,1,2), "/", substr(`END DATE`,3,4), "/",substr(`END DATE`,5,8)),
-#                                          `END DATE` = as.Date(`END DATE`, "%m/%d/%Y"))
-
 # Import References -------------------------------------------------------
 folder_references <- paste0(dir_reference,"/MSLW Reference Tables")
 #dict_paycycle_alt <- read_xlsx(paste0(folder_references, "/Dictionary_Alt Pay Cycles.xlsx"))
@@ -26,27 +20,6 @@ dict_jobcodes_MSBIB <- dict_jobcodes_MSBIB %>%
          J.C_MSBIB = `Job code`) %>% distinct()
 dict_COFTloc <- read_xlsx(paste0(folder_references, "/Dictionary_COFT.xlsx")) #this will be from matts excel file
 dict_site <- read_xlsx(paste0(folder_references, '/Dictionary_Site.xlsx'))
-
-## Splitting Biweekly 2 Pay Cycle ------------------------------------------
-#format_biweekly_paycycle <- function(dfs){
-#  dict_paycycle_alt$`Start-End` <- paste0(dict_paycycle_alt$`START DATE`, "-", dict_paycycle_alt$`END DATE`)
-#  dfs$`Start-End` <- paste0(dfs$`START DATE`, "-", dfs$`END DATE`)
-#  dfs_other <- dfs[!(dfs$`Start-End` %in% dict_paycycle_alt$`Start-End`),]
-#  dfs_alt <- dfs[dfs$`Start-End` %in% dict_paycycle_alt$`Start-End`,]
-#  dfs_alt$Hours <- dfs_alt$Hours/2
-#  dfs_alt$Expense <- dfs_alt$Expense/2
-#  dfs_alt_1 <- merge.data.frame(dfs_alt, subset(dict_paycycle_alt, select = c('Start-End', 'Start 1', 'End 1')), all.x = T)
-#  dfs_alt_2 <- merge.data.frame(dfs_alt, subset(dict_paycycle_alt, select = c('Start-End', 'Start 2', 'End 2')), all.x = T)
-#  dfs_alt_1$`START DATE` <- dfs_alt_1$`END DATE` <- dfs_alt_2$`START DATE` <- dfs_alt_2$`END DATE` <- NULL
-#  colnames(dfs_alt_1)[which("Start 1"==colnames(dfs_alt_1))] <- "START DATE"
-#  colnames(dfs_alt_1)[which("End 1"==colnames(dfs_alt_1))] <- "END DATE"
-#  colnames(dfs_alt_2)[which("Start 2"==colnames(dfs_alt_2))] <- "START DATE"
-#  colnames(dfs_alt_2)[which("End 2"==colnames(dfs_alt_2))] <- "END DATE"
-#  dfs_final <- rbind(dfs_other, dfs_alt_1, dfs_alt_2)
-#  dfs_final$`Start-End` <- NULL
-#  return(dfs_final)
-#  }
-#data_MSSL_MSW <- format_biweekly_paycycle(data_MSSL_MSW)
 
 # Lookup Jobcodes ---------------------------------------------------------
 data_MSSL_MSW <- data_MSSL_MSW %>%
