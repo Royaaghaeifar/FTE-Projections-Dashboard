@@ -1,5 +1,6 @@
 dir_reference <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement"
-
+dir_new <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
+                  "/Productivity/Analysis/FTE Projections Dashboard")
 
 # Load Libriaries ---------------------------------------------------------
 library(readxl)
@@ -19,7 +20,9 @@ dict_jobcodes_MSBIB <- dict_jobcodes_MSBIB %>%
   rename(`Position Code Description` = `Job Description`,
          J.C_MSBIB = `Job code`) %>% distinct()
 dict_COFTloc <- read_xlsx(paste0(folder_references, "/Dictionary_COFT.xlsx")) #this will be from matts excel file
-dict_site <- read_xlsx(paste0(folder_references, '/Dictionary_Site.xlsx'))
+dict_site <- as.data.frame(cbind(c("NY2162", "NY2163"), c("MSW", "MSSL")),
+                           stringsAsFactors = F)
+colnames(dict_site) <- c("Site ID", "Site")
 
 # Lookup Jobcodes ---------------------------------------------------------
 data_MSSL_MSW <- data_MSSL_MSW %>%
