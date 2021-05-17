@@ -72,14 +72,15 @@ data_MSSL_MSW <- merge.data.frame(data_MSSL_MSW, dict_site,
 colnames(data_MSSL_MSW)[which("Site" == colnames(data_MSSL_MSW))] <- "WRKD.SITE"
 
 # Rename Columns ---------------------------------------------------
-colnames(data_MSSL_MSW)[which("Hours" == colnames(data_MSSL_MSW))] <- "HOURS"
-colnames(data_MSSL_MSW)[which("Expense" == colnames(data_MSSL_MSW))] <- "EXPENSE"
-colnames(data_MSSL_MSW)[which("Department Name Worked Dept" == colnames(data_MSSL_MSW))] <- "WRKD.DESCRIPTION"
-colnames(data_MSSL_MSW)[which("Department Name Home Dept" == colnames(data_MSSL_MSW))] <- "HOME.DESCRIPTION"
-colnames(data_MSSL_MSW)[which("Pay Code" == colnames(data_MSSL_MSW))] <- "PAY.CODE"
-colnames(data_MSSL_MSW)[which("Position Code Description" == colnames(data_MSSL_MSW))] <- "J.C.DESCRIPTION"
-colnames(data_MSSL_MSW)[which("END DATE" == colnames(data_MSSL_MSW))] <- "END.DATE"
-colnames(data_MSSL_MSW)[which("Employee ID" == colnames(data_MSSL_MSW))] <- "LIFE"
+data_MSSL_MSW_2 <- data_MSSL_MSW %>%
+  rename(HOURS = Hours,
+         EXPENSE = Expense,
+         WRKD.DESCRIPTION = `Department Name Worked Dept`,
+         HOME.DESCRIPTION = `Department Name Home Dept`,
+         PAY.CODE = `Pay Code`,
+         J.C.DESCRIPTION = `Position Code Description`,
+         END.DATE = `END DATE`,
+         LIFE = `Employee ID`)
 
 # Format Columns ----------------------------------------------------------
 data_MSSL_MSW <- data_MSSL_MSW %>%
