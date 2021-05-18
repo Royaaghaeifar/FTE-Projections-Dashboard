@@ -38,10 +38,12 @@ Oracle <- Oracle%>%
             Expense = sum(Expense,na.rm = T)) %>%
   ungroup() %>%
   distinct()
-#Bring in Payroll
-COA <- read.csv("~/MSH-MSQ-Payroll/Reference Tables/SiteCOA2.csv",stringsAsFactors = F,header = F,colClasses = c("character","character"))
-colnames(COA) <- c("Entity","PAYROLL")
-Oracle <- left_join(Oracle,COA,by=c("WRKD.ENTITY"="Entity"))
+#Determine PAYROLL based on WRKD.ENTITY
+Oracle_test <- Oracle %>%
+  mutate(PAYROLL = case_when(
+    WRKD.ENTITY == "102" ~ "MSQ",
+    TRUE ~ "MSH"))
+
 
 #Check sum of hours by end date to make sure data follows proper pattern
 check <- Oracle %>% ungroup() %>% group_by(PAYROLL,End.Date) %>% summarise(Hours = sum(Hours)) %>%pivot_wider(id_cols = PAYROLL,values_from = Hours,names_from = End.Date)
