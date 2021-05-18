@@ -1,7 +1,7 @@
 dir_reference <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
                         "/Productivity/Analysis/FEMA Reimbursement",
                         "/MSHS-FEMA-Reimbursement")
-#dir_mapping <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
+dir_mapping <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
                   "/Productivity/Universal Mapping")
 #dir_data <- paste0("TBD")
 
@@ -14,18 +14,29 @@ data_MSSL_MSW <- readRDS(paste0(dir_reference, "/MSLW RAW/Data_MSSL_MSW.rds"))
 
 # Import References -------------------------------------------------------
 folder_references <- paste0(dir_reference, "/MSLW Reference Tables")
-dict_jobcodes <- read_xlsx(paste0(folder_references, "/MSLW Job Codes.xlsx"))
-dict_jobcodes <- dict_jobcodes %>% distinct_at("Position Code Description")
-dict_jobcodes_MSBIB <- read_xlsx(paste0(dir_reference,
-                                        "/MSBIB Reference",
-                                        "/MSBI Job Code Dictionary.xlsx"),
-                                 sheet = "Dictionary")
-dict_jobcodes_MSBIB <- dict_jobcodes_MSBIB %>%
-  select(`Job Description`, `Job code`) %>%
-  rename(`Position Code Description` = `Job Description`,
-         J.C_MSBIB = `Job code`) %>%
-  distinct()
-#this will be from matts excel file
+#dict_jobcodes <- read_xlsx(paste0(folder_references, "/MSLW Job Codes.xlsx"))
+dict_jobcodes_all <- read_xlsx(paste0(dir_mapping, "/MSHS_Jobcode_Mapping.xlsx"))
+#dict_jobcodes <- dict_jobcodes %>% distinct_at("Position Code Description")
+dict_jobcodes <- dict_jobcodes_all %>%
+  filter(PAYROLL == "MSMW") %>%
+  select(J.C, J.C.DESCRIPTION) %>%
+  rename(`Position Code Description` = J.C.DESCRIPTION) %>%
+  distinct_at("Position Code Description", .keep_all = T)
+#dict_jobcodes_MSBIB <- read_xlsx(paste0(dir_reference,
+                                        #"/MSBIB Reference",
+                                        #"/MSBI Job Code Dictionary.xlsx"),
+                                 #sheet = "Dictionary")
+#dict_jobcodes_MSBIB <- dict_jobcodes_MSBIB %>%
+  #select(`Job Description`, `Job code`) %>%
+  #rename(`Position Code Description` = `Job Description`,
+         #J.C_MSBIB = `Job code`) %>%
+  #distinct()
+dict_jobcodes_MSBIB <- dict_jobcodes_all %>%
+  filter(PAYROLL == "MSBIB") %>%
+  select(J.C, J.C.DESCRIPTION) %>%
+  rename(`Position Code Description` = J.C.DESCRIPTION, J.C_MSBIB = J.C) %>%
+  distinct_at("Position Code Description", .keep_all = T)
+
 dict_COFTloc <- read_xlsx(paste0(folder_references, "/Dictionary_COFT.xlsx"))
 dict_site <- as.data.frame(cbind(c("NY2162", "NY2163"), c("MSW", "MSSL")),
                            stringsAsFactors = F)
