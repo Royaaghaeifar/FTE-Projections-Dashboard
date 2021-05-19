@@ -1,6 +1,7 @@
 dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
                         "/Productivity/Universal Data")
-dir_files <- paste0(here(),"/Raw Data/MSMW Legacy/MSMW Legacy")
+#dir_files <- paste0(here(),"/Raw Data/MSMW Legacy/MSMW Legacy")
+dir_files <- paste0(here(),"/MSMW Legacy/MSMW Legacy")
 
 # Load Libraries ----------------------------------------------------------
 library(readxl)
@@ -9,7 +10,6 @@ library(tidyverse)
 library(here)
 
 # Import Data -------------------------------------------------------------
-#folder_data <- paste0(here(),"/Raw Data/MSMW Legacy/MSMW Legacy")
 list_data_files <- list.files(dir_files, pattern = "xlsx$", full.names = T)
 read_xlsx_files <- function(filename){
   dat <- read_xlsx(filename, sheet= "Export Worksheet")
@@ -79,6 +79,4 @@ data_MSSL_MSW <-left_join(data_final, dict_payroll)
 data_MSSL_MSW <- data_MSSL_MSW %>% distinct()
 
 # Save Data ---------------------------------------------------------------
-#dir_RDS <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/MSLW RAW"
-#saveRDS(data_MSSL_MSW,paste0(dir_RDS,"/Data_MSSL_MSW.rds"))
 saveRDS(data_MSSL_MSW, paste0(dir_universal,"/Labor/RDS/Data_MSSL_MSW.rds"))
