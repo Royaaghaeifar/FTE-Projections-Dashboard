@@ -3,9 +3,11 @@ library(tidyr)
 library(here)
 
 ##MSHQ##
-#List files from MSQ Raw folder
-PPend_list <- list("04/25/2020","05/23/2020","06/20/2020","08/01/2020","08/29/2020","09/26/2020","10/24/2020","11/21/2020","01/02/2021","01/23/2021","01/30/2021")
-folderOracle <- paste0(here(),"/Raw Data/MSHQ Oracle/")     
+#PP end dates for filtering each raw file
+PPend_list <- list("04/25/2020","05/23/2020","06/20/2020","08/01/2020","08/29/2020","09/26/2020","10/24/2020","11/21/2020","01/02/2021","01/23/2021","01/30/2021","02/27/2021","03/27/2021","04/24/2021")
+#file path for all raw files
+folderOracle <- paste0(here(),"/Raw Data/MSHQ Oracle/")  
+#List files from MSHQ Raw folder
 Oracle_file_list <- list.files(path=folderOracle, pattern="*.txt")
 details = file.info(list.files(path = folderOracle, pattern="*.txt", full.names = T)) %>% arrange(mtime)
 Oracle_file_list <- rownames(details)
@@ -38,12 +40,14 @@ Oracle <- Oracle%>%
             Expense = sum(Expense,na.rm = T)) %>%
   ungroup() %>%
   distinct()
-#Bring in Payroll
-COA <- read.csv("~/MSH-MSQ-Payroll/Reference Tables/SiteCOA2.csv",stringsAsFactors = F,header = F,colClasses = c("character","character"))
-colnames(COA) <- c("Entity","PAYROLL")
-Oracle <- left_join(Oracle,COA,by=c("WRKD.ENTITY"="Entity"))
+#Determine PAYROLL based on WRKD.ENTITY
+Oracle <- Oracle %>%
+  mutate(PAYROLL = case_when(
+    WRKD.ENTITY == "102" ~ "MSQ",
+    TRUE ~ "MSH"))
+
 
 #Check sum of hours by end date to make sure data follows proper pattern
 check <- Oracle %>% ungroup() %>% group_by(PAYROLL,End.Date) %>% summarise(Hours = sum(Hours)) %>%pivot_wider(id_cols = PAYROLL,values_from = Hours,names_from = End.Date)
 #Save .rds
-saveRDS(Oracle,file = "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/data_MSH_MSQ_oracle.rds")
+saveRDS(Oracle,file = "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/data_MSH_MSQ_oracle.rds")
