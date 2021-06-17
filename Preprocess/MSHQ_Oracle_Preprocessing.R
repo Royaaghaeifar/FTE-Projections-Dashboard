@@ -1,9 +1,11 @@
 library(dplyr)
 library(readxl)
 
+#universal directory 
 universal_dir <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
                         "Productivity/Universal Data/")
 
+#Read in raw MSHQ Oracle raw refresh
 data_MSH_MSQ_oracle <- readRDS(paste0(universal_dir,
                                       "Labor/RDS/data_MSH_MSQ_oracle.rds"))
 
