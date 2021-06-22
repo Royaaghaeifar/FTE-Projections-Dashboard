@@ -1,13 +1,16 @@
-dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
-                        "/Productivity/Universal Data")
-#dir_files <- paste0(here(),"/Raw Data/MSMW Legacy/MSMW Legacy")
-dir_files <- paste0(here(),"/MSMW Legacy/MSMW Legacy")
 
 # Load Libraries ----------------------------------------------------------
 library(readxl)
 library(xlsx)
 library(tidyverse)
 library(here)
+
+# Constants ---------------------------------------------------------------
+dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
+                        "/Productivity/Universal Data")
+#dir_files <- paste0(here(),"/Raw Data/MSMW Legacy/MSMW Legacy")
+dir_files <- paste0(here(),"/MSMW Legacy/MSMW Legacy")
+
 
 # Import Data -------------------------------------------------------------
 list_data_files <- list.files(dir_files, pattern = "xlsx$", full.names = T)
