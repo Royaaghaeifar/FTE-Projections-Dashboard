@@ -4,17 +4,17 @@
 
 library(dplyr)
 library(readxl) # needed for import
+library(here)
 
 # home location for working directory folder
-dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-
-dir_raw <- paste0(dir, "MSBIB Raw/")
+dir <- here()
+dir_raw <- paste0(dir, "/Raw Data/MSBIB Legacy/")
 
 # Inputs/Imports ----------------------------------------------------------
 
 
 MSBIB_file_list <- list.files(path = dir_raw, pattern = "*.xlsx")
-MSBIB_file_list <- MSBIB_file_list[-grep("~", MSBIB_file_list, value = FALSE)]
+# MSBIB_file_list <- MSBIB_file_list[-grep("~", MSBIB_file_list, value = FALSE)]
 
 MSBIB_data_list <- lapply(
   MSBIB_file_list,
@@ -33,8 +33,18 @@ rownames(MSBIB_raw_data) <- c()
 # And because the position title shouldn't change such that an employee becomes
 # a provider, the sort order of rows isn't critical.
 
-MSBIB_raw_data <- MSBIB_raw_data %>% distinct_at(vars(-c(`Position Code Description`, `POSITION CODE`)), .keep_all = TRUE)
-
+# IMPORTANT
+# add all text based columns to ensure that changes to names don't affect de-duplication
+# this might be a concern for some ID numbers, but that should be rare
+MSBIB_raw_data <- MSBIB_raw_data %>%
+  distinct_at(vars(-c(`Position Code Description`,
+                      `POSITION CODE`,
+                      `Department Name Home Dept`,
+                      `Department Name Worked Dept`,
+                      `Location Description`,
+                      `Employee Name`)),
+              .keep_all = TRUE)
+#### *******************************************
 
 MSBIB_raw_data$PAYROLL <- "MSBI"
 MSBIB_raw_data$PAYROLL[MSBIB_raw_data$WD_COFT == "4709" & MSBIB_raw_data$WD_Location == "07"] <- "MSB"
@@ -56,7 +66,7 @@ MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4408" & MS
 MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4409" & MSBIB_raw_data$WD_Location == "03" & MSBIB_raw_data$WD_Department == "4268" & MSBIB_raw_data$`Employee Name` == "WALKER, THERESA L"] <- "DUS_REMOVE"
 MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4409" & MSBIB_raw_data$WD_Location == "03" & MSBIB_raw_data$WD_Department == "4268" & MSBIB_raw_data$`Employee Name` == "WALKER, THERESA L (Lauren)"] <- "DUS_REMOVE"
 
-RDS_path <- paste0(dir, "Reference Tables/")
+RDS_path <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/"
 saveRDS(MSBIB_raw_data, file = paste0(RDS_path, "data_MSBI_MSB.rds"))
 
-rm(dir_raw, MSBIB_file_list, MSBIB_data_list, MSBIB_raw_data, RDS_path)
+rm(dir, dir_raw, MSBIB_file_list, MSBIB_data_list, MSBIB_raw_data, RDS_path)
