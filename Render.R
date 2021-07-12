@@ -7,10 +7,13 @@ library(here)
 source("System_Summary.R")
 
 #Save System Summary table
-saveRDS(System_Summary,file="J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary/System_Summary.rds")
+saveRDS(System_Summary,file=paste0("J:/deans/Presidents/SixSigma/",
+                                   "MSHS Productivity/Productivity/",
+                                   "Universal Data/Labor/RDS/",
+                                   "System_Summary.rds"))
 
 #Enter max PP end date for dashboard
-end <- "01/30/2021"
+end <- "05/22/2021"
 #render FTE Trend Dashboard
 render("FTE_Trend_Dashboard.rmd")
 
