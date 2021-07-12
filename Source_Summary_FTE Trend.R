@@ -29,7 +29,7 @@ Source_Summary <- function(data){
     select(PAYROLL,WRKD.LOCATION,HOME.LOCATION,DPT.WRKD,DPT.HOME,WRKD.DESCRIPTION,HOME.DESCRIPTION,J.C,J.C.DESCRIPTION,PAY.CODE,END.DATE.y,HOURS,EXPENSE) %>%
     group_by(PAYROLL,WRKD.LOCATION,HOME.LOCATION,DPT.WRKD,DPT.HOME,WRKD.DESCRIPTION,HOME.DESCRIPTION,J.C,J.C.DESCRIPTION,PAY.CODE,END.DATE.y) %>%
     summarize(HOURS = sum(HOURS, na.rm = T),EXPENSE = sum(EXPENSE, na.rm = T))
-  colnames(Summary)[11] <- "END.DATE"
+  colnames(Summary)[11] <- "PP.END.DATE"
   
   #Bring in paycode mapping and hours included columns
   Site_Summary <- left_join(Summary,System_Paycode) %>%
