@@ -6,7 +6,7 @@ library(knitr)
 library(kableExtra)
 
 ##Reload Master##########################################################################
-System_Summary <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/System Summary/System_Summary.rds")
+System_Summary <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/System_Summary.rds")
 System_Summary <- System_Summary %>%
   filter(PP.END.DATE >= as.Date("12/22/2019",format="%m/%d/%Y"),
          PP.END.DATE <= as.Date(end,format="%m/%d/%Y")) %>%
