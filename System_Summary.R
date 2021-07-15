@@ -8,7 +8,7 @@ preprocess <- list.files(path=paste0(here(),"/Preprocess"))
 source("Source_Summary_FTE Trend.R")
 #Run source function
 System_Source <- lapply(preprocess,function(x)Source_Func(x))
-System_Preprocess <- list(MSH_MSQ = data_MSH_MSQ,MSBIB = data_MSBI_MSB,MSSLW = data_MSSL_MSW,MSH_MSQ_Oracle = data_MSH_MSQ_oracle)
+System_Preprocess <- list(BISLR_Oracle = data_BISLR_oracle,MSH_MSQ = data_MSH_MSQ,MSBIB = data_MSBI_MSB,MSSLW = data_MSSL_MSW,MSH_MSQ_Oracle = data_MSH_MSQ_oracle)
 #summarize all preprocessed dataframes
 System_Summary_List <- lapply(System_Preprocess, function(x)Source_Summary(x))
 #bind all summary tables into system summary
