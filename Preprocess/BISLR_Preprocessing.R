@@ -36,8 +36,8 @@ data_BISLR_oracle <- data_BISLR_oracle %>%
 
 #Formatting column data types
 data_BISLR_oracle <- data_BISLR_oracle %>%
-  mutate(Hours = numeric(Hours),
-         Expense = numeric(Expense),
+  mutate(Hours = as.numeric(Hours),
+         Expense = as.numeric(Expense),
          Pay.Code = as.character(Pay.Code))
 
 #Rename columns to FTE trend column names
