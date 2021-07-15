@@ -51,9 +51,22 @@ Source_Summary <- function(data){
   #Bring in Provider Column
   System_Jobcode <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Jobcode_Mapping.xlsx")
   System_Jobcode <- System_Jobcode %>%
-    select(J.C, PROVIDER) %>%
+    select(PAYROLL,J.C, PROVIDER) %>%
     distinct()
-  Site_Summary <- left_join(Site_Summary,System_Jobcode, by = c("J.C"="J.C")) 
+  #filter on BISLR JC for MSM,MSW,MSBIB,MSB,BISLR
+  BISLR_jc <- System_Jobcode %>% filter(PAYROLL == "BISLR") %>% select(J.C,PROVIDER)
+  #fiter on MSHQ for MSH,MSQ
+  MSHQ_jc <- System_Jobcode %>% filter(PAYROLL == "MSHQ") %>% select(J.C,PROVIDER)
+  #left join for BISLR provider mapping
+  Site_Summary <- left_join(Site_Summary,BISLR_jc, by = c("J.C"="J.C")) 
+  #left join for MSHQ provider mapping
+  Site_Summary <- left_join(Site_Summary,MSHQ_jc, by = c("J.C"="J.C")) 
+  #select correct provider column based on PAYROLL
+  Site_Summary <- Site_Summary %>% 
+    mutate(PROVIDER = case_when(
+      PAYROLL %in% c("MSM","MSW","MSBIB","MSB","BISLR") ~ PROVIDER.x,
+      TRUE ~ PROVIDER.y)) %>%
+    select(-PROVIDER.x,-PROVIDER.y)
   
   Site_Summary <- Site_Summary %>% distinct()
   
