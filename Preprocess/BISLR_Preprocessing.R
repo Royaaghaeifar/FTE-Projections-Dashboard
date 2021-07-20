@@ -11,8 +11,6 @@ dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
 data_BISLR_oracle <- readRDS(paste0(dir_universal, "/Labor/RDS/data_BISLR_oracle.rds"))
 
 # Preprocessing -----------------------------------------------------------
-# Update DUS job titles
-
 
 #Add in worked and home cost center based on Full COA - will use in future
 #data_BISLR_oracle <- data_BISLR %>%
@@ -24,7 +22,7 @@ data_BISLR_oracle <- readRDS(paste0(dir_universal, "/Labor/RDS/data_BISLR_oracle
                            # substr(Full.COA.for.Home,41,44),
                            # substr(Full.COA.for.Home,5,7),
                            # substr(Full.COA.for.Home,12,16)))
-  
+
 #Add in reverse mapping for cost centers worked and home - update characters
 data_BISLR_oracle <- data_BISLR_oracle %>%
   mutate(DPT.WRKD = paste0(substr(Reverse.Map.for.Worked, 1, 4),

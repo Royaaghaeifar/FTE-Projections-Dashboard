@@ -8,6 +8,9 @@ filter_start_dates <- c("2021-02-28", "2021-03-28", "2021-04-25")
 #End date is 1 week after the end of the current Premier Distribution
 filter_end_dates <- c("2021-04-03", "2021-05-01", "2021-05-29")
 #Premier Distribution ex: 2/28/21- 3/27/21, 3/28/21 - 4/24/21
+# First weekly cycle for each BISLR Oracle file (ex. 3/28 - 4/3) is deleted
+# using delete_weekly() custom function (see function below)
+
 
 #Names of the weekly paycyle names in the payroll name column in data files
 weekly_pc <- c("WEST WEEKLY", "BIB WEEKLY")
@@ -16,8 +19,7 @@ weekly_pc <- c("WEST WEEKLY", "BIB WEEKLY")
 dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
                         "/Productivity/Universal Data")
 dir_files <- paste0(here(), "/BISLR Oracle/BISLR Oracle/")
-#delete first weekly cycle for BISLR 3/28 - 4/3 because it overlaps the start / end dates
-#Update legacy raw refresh to include the deleted weekly cycle 2/28/21 - 3/6/21
+#Legacy raw refresh to include the deleted weekly cycle 2/28/21 - 3/6/21
 
 # Import Data -------------------------------------------------------------
 #Sort files based on index (oldest to newest) must match the
@@ -67,24 +69,8 @@ delete_weekly <- function(df, pay_cycles){
     mutate(Start_End = NULL)
   #return the filtered data frame
   return(data_export)
-
-  #validation
-  #check 2/28/21 - 3/6/21 paycycle should be removed
-  #delete_pc <- data_BISLR[[1]] %>% filter(Payroll.Name %in% weekly_pc) %>%
-    #arrange(Start.Date, End.Date) %>%
-    #mutate(Start_End = paste0(Start.Date, "_", End.Date)) %>%
-    #select(Start.Date, End.Date, Start_End) %>%
-    #distinct()
-  #data_pc_removed <- data_BISLR[[1]] %>%
-    #mutate(Start_End = paste0(Start.Date, "_", End.Date)) %>%
-    #filter(!Start_End %in% delete_pc$Start_End[1]) %>%
-    #select(Start.Date, End.Date, Start_End) %>%
-    #distinct()
-  #data_pc_check <- data_BISLR[[1]] %>%
-    #select(Start.Date, End.Date) %>%
-    #arrange(Start.Date, End.Date) %>%
-    #distinct()
 }
+
 #Applying function
 data_BISLR <- lapply(data_BISLR, function(x) delete_weekly(x, weekly_pc))
 
