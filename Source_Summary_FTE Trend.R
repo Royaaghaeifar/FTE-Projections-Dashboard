@@ -64,8 +64,8 @@ Source_Summary <- function(data){
   #select correct provider column based on PAYROLL
   Site_Summary <- Site_Summary %>% 
     mutate(PROVIDER = case_when(
-      PAYROLL %in% c("MSM","MSW","MSBIB","MSB","BISLR") ~ PROVIDER.x,
-      TRUE ~ PROVIDER.y)) %>%
+      PAYROLL %in% c("MSM","MSW","MSBI","MSB","BISLR") ~ PROVIDER.x,
+      PAYROLL %in% c("MSH","MSQ","Corporate") ~ PROVIDER.y)) %>%
     select(-PROVIDER.x,-PROVIDER.y)
   
   Site_Summary <- Site_Summary %>% distinct()
