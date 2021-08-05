@@ -1,7 +1,7 @@
 library(dplyr)
 library(readxl)
 
-#universal directory 
+#universal directory
 universal_dir <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
                         "Productivity/Universal Data/")
 
@@ -10,7 +10,8 @@ data_MSH_MSQ_oracle <- readRDS(paste0(universal_dir,
                                       "Labor/RDS/data_MSH_MSQ_oracle.rds"))
 
 #Read COA for department location
-COA <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",header = T, stringsAsFactors = F)
+COA <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",
+                header = T, stringsAsFactors = F, strip.white = TRUE)
 
 #Read in job code descriptions
 JCdesc <- read_xlsx(paste0(universal_dir,
@@ -30,22 +31,22 @@ oracle <- data_MSH_MSQ_oracle %>%
 #Take first 8 digits of Home and Worked department
 oracle <- oracle %>%
   mutate(
-    Reverse.Map.for.Worked = 
+    Reverse.Map.for.Worked =
       case_when(
-        nchar(Reverse.Map.for.Worked) == 12 ~ 
+        nchar(Reverse.Map.for.Worked) == 12 ~
           substr(Reverse.Map.for.Worked,1,8),
         TRUE ~ Reverse.Map.for.Worked),
-    Reverse.Map.for.Home = 
+    Reverse.Map.for.Home =
       case_when(
-        nchar(Reverse.Map.for.Home) == 12 ~ 
+        nchar(Reverse.Map.for.Home) == 12 ~
           substr(Reverse.Map.for.Home,1,8),
         TRUE ~ Reverse.Map.for.Home))
 
 #Bring in department location
-oracle <- left_join(oracle, COA, 
+oracle <- left_join(oracle, COA,
                     by = c("Reverse.Map.for.Worked" = "Column2")) %>%
   select(1:35)
-oracle <- left_join(oracle, COA, 
+oracle <- left_join(oracle, COA,
                     by = c("Reverse.Map.for.Home" = "Column2")) %>%
   select(1:36)
 
@@ -53,7 +54,7 @@ oracle <- left_join(oracle, COA,
 oracle <- left_join(oracle,JCdesc, by = c("Job.Code" = "J.C"))
 
 #Format necessary columns
-oracle <- oracle %>% 
+oracle <- oracle %>%
   mutate(End.Date = as.Date(End.Date, format = "%m/%d/%Y"),
          Hours = as.numeric(Hours),
          Expense = as.numeric(Expense))

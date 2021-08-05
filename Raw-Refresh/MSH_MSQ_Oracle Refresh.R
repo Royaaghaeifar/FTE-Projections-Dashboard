@@ -9,13 +9,17 @@ PPend_list <- list("04/25/2020","05/23/2020","06/20/2020","08/01/2020",
                    "01/02/2021","01/23/2021","01/30/2021","02/27/2021",
                    "03/27/2021","04/24/2021","05/22/2021")
 #file path for all raw files
-folderOracle <- paste0(here(),"/Raw Data/MSHQ Oracle/")  
+folderOracle <- paste0(here(),"/Raw Data/MSHQ Oracle/")
 #List files from MSHQ Raw folder
 Oracle_file_list <- list.files(path=folderOracle, pattern="*.txt")
 details = file.info(list.files(path = folderOracle, pattern="*.txt", full.names = T)) %>% arrange(mtime)
 Oracle_file_list <- rownames(details)
 #Read files in MSQ Raw as csv
-ORACLElist = lapply(Oracle_file_list, function(x)read.csv(x, sep = "~", header=T, stringsAsFactors = F,colClasses = rep("character",32)))
+ORACLElist = lapply(Oracle_file_list,
+                    function(x)read.csv(x, sep = "~", header=T,
+                                        stringsAsFactors = F,
+                                        colClasses = rep("character",32),
+                                        strip.white = TRUE))
 #Remove overlapping dates from raw txt files
 for(i in 1:length(ORACLElist)){
   if(i == 1 | i == 11){
@@ -33,7 +37,7 @@ for(i in 1:length(ORACLElist)){
 #Bind all MSHQ files
 Oracle = do.call("rbind", ORACLElist)
 #Remove Duplicate rows and add worked entity column
-Oracle <- Oracle %>% 
+Oracle <- Oracle %>%
   mutate(WRKD.ENTITY = substr(Oracle$WD_COFT,1,3),
          Hours = as.numeric(Hours),
          Expense = as.numeric(Expense))
@@ -51,9 +55,9 @@ Oracle <- Oracle %>%
 
 
 #Check sum of hours by end date to make sure data follows proper pattern
-check <- Oracle %>% 
-  ungroup() %>% 
-  group_by(PAYROLL,End.Date) %>% 
+check <- Oracle %>%
+  ungroup() %>%
+  group_by(PAYROLL,End.Date) %>%
   summarise(Hours = sum(Hours)) %>%
   mutate(End.Date = as.Date(End.Date, format = "%m/%d/%Y")) %>%
   arrange(End.Date) %>%

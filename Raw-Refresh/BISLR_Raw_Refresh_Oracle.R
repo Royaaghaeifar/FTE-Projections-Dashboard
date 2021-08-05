@@ -33,7 +33,8 @@ sort_import_files <- function(dir_data){
   files <- data.table::data.table(name, path, index)
   files <- files %>% arrange(index)
   #Importing data as list
-  data_import <- lapply(as.list(files$path), function(x) read.csv(x, as.is = T))
+  data_import <- lapply(as.list(files$path),
+                        function(x) read.csv(x, as.is = T, strip.white = TRUE))
   return(data_import)
 }
 #applying the sort and import function
