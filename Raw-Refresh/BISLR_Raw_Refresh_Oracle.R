@@ -78,7 +78,7 @@ data_BISLR <- lapply(data_BISLR, function(x) delete_weekly(x, weekly_pc))
 #Combine all data tables in list into one
 data_BISLR <- do.call(rbind, data_BISLR)
 
-#Removing duplicates
+#Assigning Payroll values and Removing duplicates
 data_BISLR <- data_BISLR %>%
   mutate(PAYROLL = case_when(
     Facility.Hospital.Id_Worked == "NY2162" ~ "MSW",
