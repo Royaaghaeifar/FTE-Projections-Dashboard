@@ -79,8 +79,13 @@ data_BISLR <- lapply(data_BISLR, function(x) delete_weekly(x, weekly_pc))
 data_BISLR <- do.call(rbind, data_BISLR)
 
 #Removing duplicates
-data_BISLR <- data_BISLR %>% mutate(PAYROLL = "BISLR") %>% distinct()
-# need to update the Payroll name to distinguish between different sites
+data_BISLR <- data_BISLR %>%
+  mutate(PAYROLL = case_when(
+    Facility.Hospital.Id_Worked == "NY2162" ~ "MSW",
+    Facility.Hospital.Id_Worked == "NY2163" ~ "MSM",
+    substr(Full.COA.for.Worked, 1, 3) %in% c("402", "410") ~ "MSB",
+    TRUE ~ "MSBI")) %>%
+      distinct()
 
 data_BISLR <- data_BISLR %>%
   mutate(Position.Code.Description = case_when(
