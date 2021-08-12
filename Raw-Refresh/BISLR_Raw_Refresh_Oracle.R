@@ -122,5 +122,5 @@ data_BISLR <- data_BISLR %>%
   )
 
 # Save RDS ----------------------------------------------------------------
-write_rds(data_BISLR,
-          path = paste0(dir_universal,"/Labor/RDS/data_BISLR_oracle.rds"))
+saveRDS(data_BISLR,
+          file = paste0(dir_universal,"/Labor/RDS/data_BISLR_oracle.rds"))
