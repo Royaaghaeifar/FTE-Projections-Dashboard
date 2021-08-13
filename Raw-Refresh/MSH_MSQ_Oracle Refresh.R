@@ -7,7 +7,7 @@ library(here)
 PPend_list <- list("04/25/2020","05/23/2020","06/20/2020","08/01/2020",
                    "08/29/2020","09/26/2020","10/24/2020","11/21/2020",
                    "01/02/2021","01/23/2021","01/30/2021","02/27/2021",
-                   "03/27/2021","04/24/2021","05/22/2021")
+                   "03/27/2021","04/24/2021","05/22/2021","06/19/2021")
 #file path for all raw files
 folderOracle <- paste0(here(),"/Raw Data/MSHQ Oracle/")  
 #List files from MSHQ Raw folder
@@ -56,7 +56,7 @@ check <- Oracle %>%
   group_by(PAYROLL,End.Date) %>% 
   summarise(Hours = sum(Hours)) %>%
   mutate(End.Date = as.Date(End.Date, format = "%m/%d/%Y")) %>%
-  arrange(End.Date) %>%
-  pivot_wider(id_cols = PAYROLL,values_from = Hours,names_from = End.Date)
+  arrange(End.Date) 
+check1 <- pivot_wider(check,id_cols = PAYROLL,values_from = Hours,names_from = End.Date)
 #Save .rds
 saveRDS(Oracle,file = "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/data_MSH_MSQ_oracle.rds")
