@@ -7,12 +7,16 @@ dir <- paste0(here(), "/Raw Data/")
 
 ##MSQ##
 #List files from MSQ Raw folder
-folderMSQ <- paste0(dir,"MSQ Raw/")     
+folderMSQ <- paste0(dir,"MSQ Raw/")
 MSQ_file_list <- list.files(path=folderMSQ, pattern="*.txt")
 MSQ_details = file.info(list.files(path = folderMSQ, pattern="*.txt", full.names = T)) %>% arrange(mtime)
 MSQ_path_list <- rownames(MSQ_details)
 #Read files in MSQ Raw as csv
-MSQlist = lapply(MSQ_path_list, function(x)read.csv(x, sep = ";", header=T, stringsAsFactors = F,colClasses = rep("character",18)))
+MSQlist = lapply(MSQ_path_list,
+                 function(x)read.csv(x, sep = ";", header=T,
+                                     stringsAsFactors = F,
+                                     colClasses = rep("character",18),
+                                     strip.white = TRUE))
 #Bind all MSQ files and assign their site = "MSQ"
 MSQ = do.call("rbind", MSQlist)
 #Remove Duplicate rows
@@ -21,7 +25,7 @@ MSQ <- MSQ %>% distinct()
 
 ##MSH##
 #List files from MSH Raw folder
-folderMSH <- paste0(dir,"MSH Raw/")     
+folderMSH <- paste0(dir,"MSH Raw/")
 MSH_file_list <- list.files(path=folderMSH, pattern="*.txt")
 MSH_details = file.info(list.files(path = folderMSH, pattern="*.txt", full.names = T)) %>% arrange(mtime)
 MSH_path_list <- rownames(MSH_details)

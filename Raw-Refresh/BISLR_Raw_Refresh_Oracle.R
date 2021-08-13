@@ -4,9 +4,9 @@ library(here)
 
 # Constants ---------------------------------------------------------------
 #Start date is 1 day after the end of the last Premier Distribution
-filter_start_dates <- c("2021-02-28", "2021-03-28", "2021-04-25")
+filter_start_dates <- c("2021-02-28", "2021-03-28", "2021-04-25", "2021-05-23")
 #End date is 1 week after the end of the current Premier Distribution
-filter_end_dates <- c("2021-04-03", "2021-05-01", "2021-05-29")
+filter_end_dates <- c("2021-04-03", "2021-05-01", "2021-05-29", "2021-06-26")
 #Premier Distribution ex: 2/28/21- 3/27/21, 3/28/21 - 4/24/21
 # First weekly cycle for each BISLR Oracle file (ex. 3/28 - 4/3) is deleted
 # using delete_weekly() custom function (see function below)
@@ -33,10 +33,11 @@ sort_import_files <- function(dir_data){
   files <- data.table::data.table(name, path, index)
   files <- files %>% arrange(index)
   #Importing data as list
-  data_import <- lapply(as.list(files$path), function(x) read.csv(x, as.is = T))
+  data_import <- lapply(as.list(files$path),
+                        function(x) read.csv(x, as.is = T, strip.white = TRUE))
   return(data_import)
 }
-#applying the sort and import funtion
+#applying the sort and import function
 data_BISLR <- sort_import_files(dir_files)
 
 # PreProcessing Data ------------------------------------------------------
@@ -77,9 +78,14 @@ data_BISLR <- lapply(data_BISLR, function(x) delete_weekly(x, weekly_pc))
 #Combine all data tables in list into one
 data_BISLR <- do.call(rbind, data_BISLR)
 
-#Removing duplicates
-data_BISLR <- data_BISLR %>% mutate(PAYROLL = "BISLR") %>% distinct()
-# need to update the Payroll name to distinguish between different sites
+#Assigning Payroll values and Removing duplicates
+data_BISLR <- data_BISLR %>%
+  mutate(PAYROLL = case_when(
+    Facility.Hospital.Id_Worked == "NY2162" ~ "MSW",
+    Facility.Hospital.Id_Worked == "NY2163" ~ "MSM",
+    substr(Full.COA.for.Worked, 1, 3) %in% c("402", "410") ~ "MSB",
+    TRUE ~ "MSBI")) %>%
+      distinct()
 
 data_BISLR <- data_BISLR %>%
   mutate(Position.Code.Description = case_when(
@@ -116,5 +122,5 @@ data_BISLR <- data_BISLR %>%
   )
 
 # Save RDS ----------------------------------------------------------------
-write_rds(data_BISLR,
-          path = paste0(dir_universal,"/Labor/RDS/data_BISLR_oracle.rds"))
+saveRDS(data_BISLR,
+          file = paste0(dir_universal,"/Labor/RDS/data_BISLR_oracle.rds"))
