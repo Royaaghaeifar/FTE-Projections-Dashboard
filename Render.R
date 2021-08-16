@@ -13,7 +13,7 @@ saveRDS(System_Summary,file=paste0("J:/deans/Presidents/SixSigma/",
                                    "System_Summary.rds"))
 
 #Enter max PP end date for dashboard
-end <- "05/22/2021"
+end <- "06/19/2021"
 #render FTE Trend Dashboard
 render("FTE_Trend_Dashboard.rmd")
 
