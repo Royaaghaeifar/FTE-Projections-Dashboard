@@ -4,9 +4,11 @@ library(here)
 
 # Constants ---------------------------------------------------------------
 #Start date is 1 day after the end of the last Premier Distribution
-filter_start_dates <- c("2021-02-28", "2021-03-28", "2021-04-25", "2021-05-23")
+filter_start_dates <- c("2021-02-28", "2021-03-28", "2021-04-25", "2021-05-23",
+                        "2021-06-20")
 #End date is 1 week after the end of the current Premier Distribution
-filter_end_dates <- c("2021-04-03", "2021-05-01", "2021-05-29", "2021-06-26")
+filter_end_dates <- c("2021-04-03", "2021-05-01", "2021-05-29", "2021-06-26",
+                      "2021-08-07")
 #Premier Distribution ex: 2/28/21- 3/27/21, 3/28/21 - 4/24/21
 # First weekly cycle for each BISLR Oracle file (ex. 3/28 - 4/3) is deleted
 # using delete_weekly() custom function (see function below)
