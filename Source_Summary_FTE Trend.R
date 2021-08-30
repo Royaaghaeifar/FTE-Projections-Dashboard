@@ -54,22 +54,23 @@ Source_Summary <- function(data){
     select(PAYROLL,J.C, PROVIDER) %>%
     distinct()
   
-  System_Jobcode <- select(System_Jobcode, J.C, PROVIDER)
-  Site_Summary <- left_join(Site_Summary,System_Jobcode, by = c("J.C"="J.C")) 
-  # #filter on BISLR JC for MSM,MSW,MSBIB,MSB,BISLR
-  # BISLR_jc <- System_Jobcode %>% filter(PAYROLL == "BISLR") %>% select(J.C,PROVIDER)
-  # #fiter on MSHQ for MSH,MSQ
-  # MSHQ_jc <- System_Jobcode %>% filter(PAYROLL == "MSHQ") %>% select(J.C,PROVIDER)
-  # #left join for BISLR provider mapping
-  # Site_Summary <- left_join(Site_Summary,BISLR_jc, by = c("J.C"="J.C")) 
-  # #left join for MSHQ provider mapping
-  # Site_Summary <- left_join(Site_Summary,MSHQ_jc, by = c("J.C"="J.C")) 
-  # #select correct provider column based on PAYROLL
-  # Site_Summary <- Site_Summary %>% 
-  #   mutate(PROVIDER = case_when(
-  #     PAYROLL %in% c("MSM","MSW","MSBI","MSB","BISLR") ~ PROVIDER.x,
-  #     PAYROLL %in% c("MSH","MSQ","Corporate") ~ PROVIDER.y)) %>%
-  #   select(-PROVIDER.x,-PROVIDER.y)
+  #System_Jobcode <- select(System_Jobcode, J.C, PROVIDER)
+  #Site_Summary <- left_join(Site_Summary,System_Jobcode, by = c("J.C"="J.C")) 
+  
+  #filter on BISLR JC for MSM,MSW,MSBIB,MSB,BISLR
+  BISLR_jc <- System_Jobcode %>% filter(PAYROLL == "BISLR") %>% select(J.C,PROVIDER)
+  #fiter on MSHQ for MSH,MSQ
+  MSHQ_jc <- System_Jobcode %>% filter(PAYROLL == "MSHQ") %>% select(J.C,PROVIDER)
+  #left join for BISLR provider mapping
+  Site_Summary <- left_join(Site_Summary,BISLR_jc, by = c("J.C"="J.C")) 
+  #left join for MSHQ provider mapping
+  Site_Summary <- left_join(Site_Summary,MSHQ_jc, by = c("J.C"="J.C")) 
+  #select correct provider column based on PAYROLL
+  Site_Summary <- Site_Summary %>% 
+    mutate(PROVIDER = case_when(
+       PAYROLL %in% c("MSM","MSW","MSBI","MSB") ~ PROVIDER.x,
+       PAYROLL %in% c("MSH","MSQ","Corporate") ~ PROVIDER.y)) %>%
+     select(-PROVIDER.x,-PROVIDER.y)
   
   Site_Summary <- Site_Summary %>% distinct()
   
