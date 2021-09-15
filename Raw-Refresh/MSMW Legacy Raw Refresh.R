@@ -4,6 +4,7 @@ library(readxl)
 library(xlsx)
 library(tidyverse)
 library(here)
+library(rstudioapi)
 
 # Constants ---------------------------------------------------------------
 dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
@@ -74,7 +75,12 @@ data_final$`Start-End` <- data_final$Source <- NULL
 
 # Add Payroll Source ------------------------------------------------------
 dict_payroll <- data.table::data.table(PAYROLL = c('MSW', 'MSM'), `Facility Hospital Id_Worked` = c ('NY2162', 'NY2163'))
+#Checking row count before left join
+row_count <- nrow(data_final)
 data_MSSL_MSW <-left_join(data_final, dict_payroll)
+#If rows added during left join stop executing code
+if(nrow(data_MSSL_MSW) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
 # Remove Duplicates -------------------------------------------------------
 data_MSSL_MSW <- data_MSSL_MSW %>% distinct()
