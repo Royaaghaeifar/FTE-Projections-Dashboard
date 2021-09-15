@@ -1,9 +1,10 @@
 dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
                   "/Productivity/Universal Data")
 
-# Load Libriaries ---------------------------------------------------------
+# Load Libraries ---------------------------------------------------------
 library(readxl)
 library(tidyverse)
+library(rstudioapi)
 
 # Import Data -------------------------------------------------------------
 data_MSSL_MSW <- readRDS(paste0(dir_universal, "/Labor/RDS/Data_MSSL_MSW.rds"))
@@ -30,8 +31,20 @@ data_MSSL_MSW <- data_MSSL_MSW %>%
   mutate(`Position Code Description` = case_when(
     is.na(`Position Code Description`) ~ "OTHER",
     TRUE ~ `Position Code Description`))
+
+#Checking row count before left join
+row_count <- nrow(data_MSSL_MSW)
 data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_jobcodes)
+#If rows added during left join stop executing code
+if(nrow(data_MSSL_MSW ) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+#Checking row count before left join
+row_count <- nrow(data_MSSL_MSW)
 data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_jobcodes_MSBIB)
+#If rows added during left join stop executing code
+if(nrow(data_MSSL_MSW ) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 data_MSSL_MSW <- data_MSSL_MSW %>%
   mutate(J.C = case_when(
     is.na(J.C) ~ J.C_MSBIB,
