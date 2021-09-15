@@ -1,4 +1,3 @@
-library(here)
 library(rstudioapi)
 
 row_count <- nrow(var)
