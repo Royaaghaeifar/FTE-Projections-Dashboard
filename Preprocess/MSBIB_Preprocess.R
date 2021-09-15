@@ -4,6 +4,7 @@
 
 library(dplyr)
 library(readxl)
+library(rstudioapi)
 
 univ_ref <- paste0(
   "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/",
@@ -49,61 +50,97 @@ payroll_data_process$DPT.HOME <- paste0(
   payroll_data_process$HD_Department
 )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, coft_desc,
   by.x = "WD_COFT", by.y = "COFT",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     WRKD.COFT.DESC = COFT_Description
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, coft_desc,
   by.x = "HD_COFT", by.y = "COFT",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     HOME.COFT.DESC = COFT_Description
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, simp_loc,
   by.x = "WD_COFT", by.y = "COFT",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     WRKD.LOCATION = COFT_LOC_GROUP
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, simp_loc,
   by.x = "HD_COFT", by.y = "COFT",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     HOME.LOCATION = COFT_LOC_GROUP
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, loc_desc,
   by.x = "WD_Location", by.y = "Location",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     cc_wd_loc = LOC_Name
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, loc_desc,
   by.x = "HD_Location", by.y = "Location",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     cc_hd_loc = LOC_Name
@@ -114,6 +151,8 @@ payroll_data_process <- payroll_data_process %>%
     is.na(`Position Code Description`) ~ "OTHER",
     TRUE ~ `Position Code Description`))
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process,
   jc_dict %>%
@@ -122,7 +161,12 @@ payroll_data_process <- merge(
   by.x = "Position Code Description", by.y = "J.C.DESCRIPTION",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process,
   jc_dict %>%
@@ -131,6 +175,10 @@ payroll_data_process <- merge(
   by.x = "Position Code Description", by.y = "J.C.DESCRIPTION",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 
 payroll_data_process <- payroll_data_process %>%
   mutate(J.C.x = case_when(
