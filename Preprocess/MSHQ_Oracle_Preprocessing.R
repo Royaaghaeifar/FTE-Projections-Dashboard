@@ -1,5 +1,6 @@
 library(dplyr)
 library(readxl)
+library(rstudioapi)
 
 #universal directory
 universal_dir <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
@@ -43,12 +44,19 @@ oracle <- oracle %>%
         TRUE ~ Reverse.Map.for.Home))
 
 #Bring in department location
+row_count <- nrow(oracle)
 oracle <- left_join(oracle, COA,
                     by = c("Reverse.Map.for.Worked" = "Column2")) %>%
   select(1:35)
+if(nrow(oracle) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
+row_count <- nrow(oracle)
 oracle <- left_join(oracle, COA,
                     by = c("Reverse.Map.for.Home" = "Column2")) %>%
   select(1:36)
+if(nrow(oracle) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
 #Bring in standardized JC Description
 oracle <- left_join(oracle,JCdesc, by = c("Job.Code" = "J.C"))
