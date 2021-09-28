@@ -1,5 +1,6 @@
 library(tidyverse)
 library(readxl)
+library(rstudioapi)
 
 universal_dir <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
                         "Productivity/Universal Data/")
@@ -17,11 +18,18 @@ JCdesc <- read_xlsx(paste0(universal_dir,
   select(J.C, J.C.DESCRIPTION)
 
 #bring in J.C description
+row_count <- nrow(data_MSH_MSQ)
 data_MSH_MSQ <- left_join(data_MSH_MSQ,JCdesc)
+if(nrow(data_MSH_MSQ) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
 #bring in department description and Location
+row_count <- nrow(data_MSH_MSQ)
 data_MSH_MSQ <- left_join(data_MSH_MSQ,COA,by = c("DPT.WRKD" = "Column2")) %>%
   select(1:21)
+if(nrow(data_MSH_MSQ) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 colnames(data_MSH_MSQ)[20:21] <- c("LOCATION","DESCRIPTION")
 
 #Correct negative hours and expenses
