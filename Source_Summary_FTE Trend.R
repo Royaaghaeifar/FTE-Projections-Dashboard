@@ -27,10 +27,15 @@ Source_Summary <- function(data){
   
   
   #assign pp end dates and summarize
-  Summary <- left_join(Department,PayCycle,by = c("END.DATE" = "DATE")) %>%
+  row_count <- nrow(Department)
+  department_paycylce <- left_join(Department,PayCycle,by = c("END.DATE" = "DATE")) 
+  if(nrow(department_paycylce) != row_count){
+    stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+  Summary <- department_paycylce %>%
     select(PAYROLL,WRKD.LOCATION,HOME.LOCATION,DPT.WRKD,DPT.HOME,WRKD.DESCRIPTION,HOME.DESCRIPTION,J.C,J.C.DESCRIPTION,PAY.CODE,END.DATE.y,HOURS,EXPENSE) %>%
     group_by(PAYROLL,WRKD.LOCATION,HOME.LOCATION,DPT.WRKD,DPT.HOME,WRKD.DESCRIPTION,HOME.DESCRIPTION,J.C,J.C.DESCRIPTION,PAY.CODE,END.DATE.y) %>%
     summarize(HOURS = sum(HOURS, na.rm = T),EXPENSE = sum(EXPENSE, na.rm = T))
+  
   colnames(Summary)[11] <- "PP.END.DATE"
   
   #Bring in paycode mapping and hours included columns
@@ -88,5 +93,6 @@ Source_Summary <- function(data){
   
   Site_Summary <- Site_Summary %>% distinct()
   
+  rm(row_count)
   return(Site_Summary)
 }
