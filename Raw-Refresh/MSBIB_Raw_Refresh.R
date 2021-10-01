@@ -5,6 +5,7 @@
 library(dplyr)
 library(readxl) # needed for import
 library(here)
+library(rstudioapi)
 
 # home location for working directory folder
 dir <- here()
