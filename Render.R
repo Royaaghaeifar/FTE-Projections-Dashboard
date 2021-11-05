@@ -6,14 +6,24 @@ library(here)
 ###Check error report for any mapping issues###########
 source("System_Summary.R")
 
+#Enter max PP end date for dashboard
+end <- "07/31/2021"
+
 #Save System Summary table
 saveRDS(System_Summary,file=paste0("J:/deans/Presidents/SixSigma/",
                                    "MSHS Productivity/Productivity/",
                                    "Universal Data/Labor/RDS/",
                                    "System_Summary.rds"))
+#Save System SUmmary table pre filtered for dashboard
+saveRDS(System_Summary %>% 
+          filter(PP.END.DATE >= as.Date("12/22/2019",format="%m/%d/%Y"),
+                 PP.END.DATE <= as.Date(end,format="%m/%d/%Y")) %>%
+          replace_na(list(SERVICE.LINE = "Other")),
+        file=paste0("J:/deans/Presidents/SixSigma/",
+                                   "MSHS Productivity/Productivity/",
+                                   "Universal Data/Labor/RDS/",
+                                   "System_Summary_Dashboard.rds"))
 
-#Enter max PP end date for dashboard
-end <- "07/31/2021"
 #render FTE Trend Dashboard
 render("FTE_Trend_Dashboard.rmd")
 
