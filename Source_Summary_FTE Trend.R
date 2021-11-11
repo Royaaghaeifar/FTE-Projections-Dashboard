@@ -51,7 +51,7 @@ Source_Summary <- function(data){
     filter(FTE.TREND == 1) %>%
     select(COST.CENTER, DEFINITION.CODE, DEFINITION.NAME, SERVICE.LINE, SITE)
   row_count <- nrow(Site_Summary)
-  Site_Summary <- left_join(Site_Summary,System_Department, by = c("DPT.WRKD" = "COST.CENTER")) %>%
+  Site_Summary <- left_join(Site_Summary,System_Department, by = c("DPT.WRKD" = "ORACLE.COST.CENTER")) %>%
     ungroup() %>%
     mutate(SITE = case_when(
       is.na(SITE) ~ PAYROLL,
