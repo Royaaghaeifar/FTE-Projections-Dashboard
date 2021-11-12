@@ -7,7 +7,7 @@ library(here)
 source("System_Summary.R")
 
 #Enter max PP end date for dashboard
-end <- "07/31/2021"
+end <- "09/25/2021"
 
 #Save System Summary table
 saveRDS(System_Summary,file=paste0("J:/deans/Presidents/SixSigma/",
@@ -18,7 +18,7 @@ saveRDS(System_Summary,file=paste0("J:/deans/Presidents/SixSigma/",
 saveRDS(System_Summary %>% 
           filter(PP.END.DATE >= as.Date("12/22/2019",format="%m/%d/%Y"),
                  PP.END.DATE <= as.Date(end,format="%m/%d/%Y")) %>%
-          replace_na(list(SERVICE.LINE = "Other")),
+          replace_na(list(CORPORATE.SERVICE.LINE = "Other")),
         file=paste0("J:/deans/Presidents/SixSigma/",
                                    "MSHS Productivity/Productivity/",
                                    "Universal Data/Labor/RDS/",
