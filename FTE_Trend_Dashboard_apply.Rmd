@@ -1,0 +1,61 @@
+---
+title: MSHS Worked FTE Dashboard
+author: Health System Operations
+date: 'Publish Date: `r Sys.Date()`'
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+---
+
+<style type="text/css">
+div.main-container {
+  max-width: 1760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+```{r, echo=F,warning=F,message=F,results='hide'}
+source("Dashboard_Functions.R")
+```
+
+#### Reporting Period: `r rep`
+#### Baseline Period: 12/22/2019 to 02/29/2020
+#### * Department does not currently have a Premier productivity report
+#### 1 FTE = 75 Worked Hours/Pay Period
+## Mount Sinai Health System
+
+```{r, echo=F,warning=F,message=F, results=F}
+library(htmltools)
+sites_services_df <- data %>% 
+  ungroup() %>% 
+  select(PAYROLL, CORPORATE.SERVICE.LINE) %>% 
+  filter(!is.na(PAYROLL)) %>% 
+  distinct()
+sites <- unique(sites_services_df$PAYROLL)
+render_list <- sapply(X = sites,
+                     function(x) {
+                       site_service_lines <<- sites_services_df %>%
+                         filter(PAYROLL == x)
+                       list(h2(x),
+                            sapply(X = unique(site_service_lines$CORPORATE.SERVICE.LINE),
+                                   function(y) {
+                                     list(h3(y),
+                                          service_line(hosp = x, service = y),
+                                          HTML(k(hosp = x, service = y)))
+                                   },
+                                   simplify = FALSE,
+                                   USE.NAMES = TRUE
+                            )
+                       )
+                     },
+                     simplify = FALSE,
+                     USE.NAMES = TRUE
+)
+```
+
+```{r, echo=F,warning=F,message=F,fig.width=12, results='asis'}
+tagList(render_list)
+```
