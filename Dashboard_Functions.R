@@ -14,33 +14,12 @@ worked_paycodes <- c('REGULAR','OVERTIME','OTHER_WORKED','EDUCATION','ORIENTATIO
 #pre covid pay period end dates
 pre_covid_PP <- as.Date(c('2020-01-04','2020-01-18','2020-02-01','2020-02-15','2020-02-29'))
 #get unique service lines and sites
-service_lines <- c('Nursing - Administration', 'Nursing - Adolescent Psych' ,'Nursing - Adult Psych' ,'Nursing - Antepartum / Postpartum' ,'Nursing - Cardiology' ,'Nursing - Critical Care' ,'Nursing - Critical Care / Intermediate Care Blend' ,'Nursing - Critical Care Cardiac' ,'Nursing - Dialysis' ,'Nursing - Education' ,'Nursing - Emergency Department' ,'Nursing - Emergency Medicine' ,'Nursing - Intermediate Care' ,'Nursing - Labor & Delivery' ,'Nursing - Med Surg' ,'Nursing - Med Surg Intermediate Care Blend' ,'Nursing - Neonatal ICU' ,'Nursing - Observation' ,'Nursing - Palliative' ,'Nursing - Postpartum' ,'Nursing - Psych ED' ,'Nursing - Rehab' ,'Nursing - Telemetry Cardiac' ,'Nursing - Telemetry Med Surg' ,'Nursing - Telemetry Observation Blend' ,'Nursing' ,'Radiology - CT' ,'Radiology - CT/Diagnostic' ,'Radiology - Diagnostic' ,'Radiology - Interventional' ,'Radiology - Interventional/CT' ,'Radiology - Mammography' ,'Radiology - Mammography/Diagnostic' ,'Radiology - Mammography/Interventional' ,'Radiology - MRI' ,'Radiology - Nuclear Medicine' ,'Radiology - Nuclear Medicine/PET' ,'Radiology - PET/CT' ,'Radiology - Support' ,'Radiology - Ultrasound' ,'Support Services - Biomed / Clinical Engineering' ,'Support Services - Blood Bank' ,'Support Services - Clinical Nutrition' ,'Support Services - Engineering' ,'Support Services - Environmental Services' ,'Support Services - Food Services' ,'Support Services - Linen' ,'Support Services - Patient Transport' ,'Support Services - Safety' ,'Support Services - Security' ,'Perioperative Services' ,'Admitting' ,'Ambulatory - MSBI' ,'Ambulatory - MSDUS' ,'Cardiology' ,'Emergency Medicine' ,'Employee Health Services' ,'Lab' ,'Materials Management' ,'Medical Records' ,'Pharmacy' ,'Rehab' ,'Respiratory' ,'Supply Chain' ,'System CMO' ,'System CMO - Case Management' ,'Other')
-site_list <- c("MSH","MSQ","MSBI","MSB","MSW","MSM")
-#convert corporate service line to factor
-System_Summary <- System_Summary %>%
-  mutate(CORPORATE.SERVICE.LINE = factor(
-    x = CORPORATE.SERVICE.LINE,
-    levels = service_lines)) %>%
-  mutate(PAYROLL = factor(
-    x = PAYROLL,
-    levels = site_list))
-
-# nursing_service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU")
-# corporate_service_lines <- list("IT","HR","CMO")
-# supportservices_service_lines <- list("Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin")
+service_lines <- c('IT', 'HR', 'CMO', 'Nursing - Administration', 'Nursing - Adolescent Psych' ,'Nursing - Adult Psych' ,'Nursing - Antepartum / Postpartum' ,'Nursing - Cardiology' ,'Nursing - Critical Care' ,'Nursing - Critical Care / Intermediate Care Blend' ,'Nursing - Critical Care Cardiac' ,'Nursing - Dialysis' ,'Nursing - Education' ,'Nursing - Emergency Department' ,'Nursing - Emergency Medicine' ,'Nursing - Intermediate Care' ,'Nursing - Labor & Delivery' ,'Nursing - Med Surg' ,'Nursing - Med Surg Intermediate Care Blend' ,'Nursing - Neonatal ICU' ,'Nursing - Observation' ,'Nursing - Palliative' ,'Nursing - Postpartum' ,'Nursing - Psych ED' ,'Nursing - Rehab' ,'Nursing - Telemetry Cardiac' ,'Nursing - Telemetry Med Surg' ,'Nursing - Telemetry Observation Blend' ,'Nursing' ,'Radiology - CT' ,'Radiology - CT/Diagnostic' ,'Radiology - Diagnostic' ,'Radiology - Interventional' ,'Radiology - Interventional/CT' ,'Radiology - Mammography' ,'Radiology - Mammography/Diagnostic' ,'Radiology - Mammography/Interventional' ,'Radiology - MRI' ,'Radiology - Nuclear Medicine' ,'Radiology - Nuclear Medicine/PET' ,'Radiology - PET/CT' ,'Radiology - Support' ,'Radiology - Ultrasound' ,'Support Services - Biomed / Clinical Engineering' ,'Support Services - Blood Bank' ,'Support Services - Clinical Nutrition' ,'Support Services - Engineering' ,'Support Services - Environmental Services' ,'Support Services - Food Services' ,'Support Services - Linen' ,'Support Services - Patient Transport' ,'Support Services - Safety' ,'Support Services - Security' ,'Perioperative Services' ,'Admitting' ,'Ambulatory - MSBI' ,'Ambulatory - MSDUS' ,'Cardiology' ,'Emergency Medicine' ,'Employee Health Services' ,'Lab' ,'Materials Management' ,'Medical Records' ,'Pharmacy' ,'Rehab' ,'Respiratory' ,'Supply Chain' ,'System CMO' ,'System CMO - Case Management' ,'Other')
+site_list <- c("Corporate", "MSH","MSQ","MSBI","MSB","MSM","MSW")
 
 report_period_length <- 3
 biweekly_fte <- 75
 digits_round <- 2
-
-# #Site Based Service List
-# MSH_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin","Pharmacy","Radiology","Lab","Emergency Department","Other")
-# MSQ_service_list <- list("ICU","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Security","Linen","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
-# MSBI_service_list <- list("ICU","Progressive","Med/Surg","Psych","RETU","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Linen","HIM","Mail","Pharmacy","Radiology","Lab","Emergency Department","Other")
-# MSB_service_list <- list("ICU","Progressive","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
-# MSW_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","Mail","Misc Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
-# MSM_service_list <- list("ICU","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Mail","Misc Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
-
 
 #Pre filter data 
 data <- System_Summary %>%
@@ -57,10 +36,17 @@ data <- data %>%
   pivot_longer(cols = 5:ncol(data),names_to = "PP.END.DATE", values_to = "FTE")
 data <- data %>%
   mutate(DEPARTMENT = case_when(
+    CORPORATE.SERVICE.LINE %in% c("IT", "HR", "CMO") ~ CORPORATE.SERVICE.LINE,
     is.na(DEFINITION.CODE) ~ "Non-Premier",
     TRUE ~ paste0(DEFINITION.CODE," - ",toupper(DEFINITION.NAME))), #capitalize department
     DATES = as.character(PP.END.DATE),
     PP.END.DATE = as.Date(PP.END.DATE,format="%Y-%m-%d")) %>% #add character form of data
+  mutate(CORPORATE.SERVICE.LINE = factor(
+    x = CORPORATE.SERVICE.LINE,
+    levels = service_lines)) %>%
+  mutate(PAYROLL = factor(
+    x = PAYROLL,
+    levels = site_list)) %>%
   arrange(CORPORATE.SERVICE.LINE) #arrange by pay period end date
 
 #Get Reporting Period data range
