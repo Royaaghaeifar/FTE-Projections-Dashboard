@@ -13,24 +13,34 @@ System_Summary <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Produc
 worked_paycodes <- c('REGULAR','OVERTIME','OTHER_WORKED','EDUCATION','ORIENTATION','AGENCY')
 #pre covid pay period end dates
 pre_covid_PP <- as.Date(c('2020-01-04','2020-01-18','2020-02-01','2020-02-15','2020-02-29'))
-#get unique service lines
-#service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
-service_lines <- list('Nursing - Administration', 'Nursing - Adolescent Psych' ,'Nursing - Adult Psych' ,'Nursing - Antepartum / Postpartum' ,'Nursing - Cardiology' ,'Nursing - Critical Care' ,'Nursing - Critical Care / Intermediate Care Blend' ,'Nursing - Critical Care Cardiac' ,'Nursing - Dialysis' ,'Nursing - Education' ,'Nursing - Emergency Department' ,'Nursing - Emergency Medicine' ,'Nursing - Intermediate Care' ,'Nursing - Labor & Delivery' ,'Nursing - Med Surg' ,'Nursing - Med Surg Intermediate Care Blend' ,'Nursing - Neonatal ICU' ,'Nursing - Observation' ,'Nursing - Palliative' ,'Nursing - Postpartum' ,'Nursing - Psych ED' ,'Nursing - Rehab' ,'Nursing - Telemetry Cardiac' ,'Nursing - Telemetry Med Surg' ,'Nursing - Telemetry Observation Blend' ,'Nursing' ,'Radiology - CT' ,'Radiology - CT/Diagnostic' ,'Radiology - Diagnostic' ,'Radiology - Interventional' ,'Radiology - Interventional/CT' ,'Radiology - Mammography' ,'Radiology - Mammography/Diagnostic' ,'Radiology - Mammography/Interventional' ,'Radiology - MRI' ,'Radiology - Nuclear Medicine' ,'Radiology - Nuclear Medicine/PET' ,'Radiology - PET/CT' ,'Radiology - Support' ,'Radiology - Ultrasound' ,'Support Services - Biomed / Clinical Engineering' ,'Support Services - Blood Bank' ,'Support Services - Clinical Nutrition' ,'Support Services - Engineering' ,'Support Services - Environmental Services' ,'Support Services - Food Services' ,'Support Services - Linen' ,'Support Services - Patient Transport' ,'Support Services - Safety' ,'Support Services - Security' ,'Perioperative Services' ,'Admitting' ,'Ambulatory - MSBI' ,'Ambulatory - MSDUS' ,'Cardiology' ,'Emergency Medicine' ,'Employee Health Services' ,'Lab' ,'Materials Management' ,'Medical Records' ,'Pharmacy' ,'Rehab' ,'Respiratory' ,'Supply Chain' ,'System CMO' ,'System CMO - Case Management' ,'Other')
-nursing_service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU")
-corporate_service_lines <- list("IT","HR","CMO")
-supportservices_service_lines <- list("Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin")
+#get unique service lines and sites
+service_lines <- c('Nursing - Administration', 'Nursing - Adolescent Psych' ,'Nursing - Adult Psych' ,'Nursing - Antepartum / Postpartum' ,'Nursing - Cardiology' ,'Nursing - Critical Care' ,'Nursing - Critical Care / Intermediate Care Blend' ,'Nursing - Critical Care Cardiac' ,'Nursing - Dialysis' ,'Nursing - Education' ,'Nursing - Emergency Department' ,'Nursing - Emergency Medicine' ,'Nursing - Intermediate Care' ,'Nursing - Labor & Delivery' ,'Nursing - Med Surg' ,'Nursing - Med Surg Intermediate Care Blend' ,'Nursing - Neonatal ICU' ,'Nursing - Observation' ,'Nursing - Palliative' ,'Nursing - Postpartum' ,'Nursing - Psych ED' ,'Nursing - Rehab' ,'Nursing - Telemetry Cardiac' ,'Nursing - Telemetry Med Surg' ,'Nursing - Telemetry Observation Blend' ,'Nursing' ,'Radiology - CT' ,'Radiology - CT/Diagnostic' ,'Radiology - Diagnostic' ,'Radiology - Interventional' ,'Radiology - Interventional/CT' ,'Radiology - Mammography' ,'Radiology - Mammography/Diagnostic' ,'Radiology - Mammography/Interventional' ,'Radiology - MRI' ,'Radiology - Nuclear Medicine' ,'Radiology - Nuclear Medicine/PET' ,'Radiology - PET/CT' ,'Radiology - Support' ,'Radiology - Ultrasound' ,'Support Services - Biomed / Clinical Engineering' ,'Support Services - Blood Bank' ,'Support Services - Clinical Nutrition' ,'Support Services - Engineering' ,'Support Services - Environmental Services' ,'Support Services - Food Services' ,'Support Services - Linen' ,'Support Services - Patient Transport' ,'Support Services - Safety' ,'Support Services - Security' ,'Perioperative Services' ,'Admitting' ,'Ambulatory - MSBI' ,'Ambulatory - MSDUS' ,'Cardiology' ,'Emergency Medicine' ,'Employee Health Services' ,'Lab' ,'Materials Management' ,'Medical Records' ,'Pharmacy' ,'Rehab' ,'Respiratory' ,'Supply Chain' ,'System CMO' ,'System CMO - Case Management' ,'Other')
+site_list <- c("MSH","MSQ","MSBI","MSB","MSW","MSM")
+#convert corporate service line to factor
+System_Summary <- System_Summary %>%
+  mutate(CORPORATE.SERVICE.LINE = factor(
+    x = CORPORATE.SERVICE.LINE,
+    levels = service_lines)) %>%
+  mutate(PAYROLL = factor(
+    x = PAYROLL,
+    levels = site_list))
+
+# nursing_service_lines <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU")
+# corporate_service_lines <- list("IT","HR","CMO")
+# supportservices_service_lines <- list("Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin")
+
 report_period_length <- 3
 biweekly_fte <- 75
 digits_round <- 2
 
-#Site Based Service List
-MSH_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin","Pharmacy","Radiology","Lab","Emergency Department","Other")
-MSQ_service_list <- list("ICU","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Security","Linen","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
-MSBI_service_list <- list("ICU","Progressive","Med/Surg","Psych","RETU","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Linen","HIM","Mail","Pharmacy","Radiology","Lab","Emergency Department","Other")
-MSB_service_list <- list("ICU","Progressive","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
-MSW_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","Mail","Misc Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
-MSM_service_list <- list("ICU","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Mail","Misc Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
-site_list <- list("MSH","MSQ","MSBI","MSB","MSW","MSM")
+# #Site Based Service List
+# MSH_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","RETU", "Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Telecom","Mail","Misc Support Services","Support Service Admin","Pharmacy","Radiology","Lab","Emergency Department","Other")
+# MSQ_service_list <- list("ICU","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Security","Linen","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
+# MSBI_service_list <- list("ICU","Progressive","Med/Surg","Psych","RETU","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Linen","HIM","Mail","Pharmacy","Radiology","Lab","Emergency Department","Other")
+# MSB_service_list <- list("ICU","Progressive","Med/Surg","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","HIM","Pharmacy","Radiology","Lab","Emergency Department","Other")
+# MSW_service_list <- list("ICU","Labor & Delivery","Mother/Baby","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","Mail","Misc Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+# MSM_service_list <- list("ICU","Progressive","Med/Surg","Psych","Perioperative Services","Clinical Engineering","Engineering","Environmental Services","Food & Nutrition Services","Patient & Equipment Transport","Security","Rehab","Linen","HIM","Mail","Misc Support Services","Pharmacy","Radiology","Lab","Emergency Department","Other")
+
 
 #Pre filter data 
 data <- System_Summary %>%
@@ -39,10 +49,10 @@ data <- System_Summary %>%
          PROVIDER == 0, #remove providers
          INCLUDE.HOURS == 1, #only use included hour paycodes
          PAY.CODE.MAPPING %in% worked_paycodes) %>% #remove unproductive paycodes 
-  group_by(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,SERVICE.LINE,PP.END.DATE) %>%
+  group_by(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,CORPORATE.SERVICE.LINE,PP.END.DATE) %>%
   summarise(FTE = sum(HOURS, na.rm = T)/biweekly_fte) %>% #calculate FTE
-  pivot_wider(id_cols = c(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,SERVICE.LINE),values_from = FTE,names_from = PP.END.DATE)
-data[,4:ncol(data)][is.na(data[,4:ncol(data)])] <- 0
+  pivot_wider(id_cols = c(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,CORPORATE.SERVICE.LINE),values_from = FTE,names_from = PP.END.DATE)
+data[,5:ncol(data)][is.na(data[,5:ncol(data)])] <- 0
 data <- data %>%
   pivot_longer(cols = 5:ncol(data),names_to = "PP.END.DATE", values_to = "FTE")
 data <- data %>%
@@ -51,14 +61,24 @@ data <- data %>%
     TRUE ~ paste0(DEFINITION.CODE," - ",toupper(DEFINITION.NAME))), #capitalize department
     DATES = as.character(PP.END.DATE),
     PP.END.DATE = as.Date(PP.END.DATE,format="%Y-%m-%d")) %>% #add character form of data
-  arrange(PP.END.DATE) #arrange by pay period end date
+  arrange(CORPORATE.SERVICE.LINE) #arrange by pay period end date
 
 #Get Reporting Period data range
-rep <- data %>% ungroup() %>% select(PP.END.DATE) %>% as.vector() %>% distinct() 
+rep <- data %>% 
+  ungroup() %>% 
+  arrange(PP.END.DATE) %>% 
+  select(PP.END.DATE) %>% 
+  as.vector() %>% 
+  distinct() 
 rep_per <- as.vector(rep[c(nrow(rep)-2,nrow(rep)-1,nrow(rep)),1])
 rep_per[1,1] <- rep_per[1,1]-13
 rep_per$PP.END.DATE <- as.character(rep_per$PP.END.DATE)
-rep <- paste0(substr(rep_per[1,1],6,7),"/",substr(rep_per[1,1],9,10),"/",substr(rep_per[1,1],1,4)," to ",substr(rep_per[3,1],6,7),"/",substr(rep_per[3,1],9,10),"/",substr(rep_per[3,1],1,4))
+rep <- paste0(substr(rep_per[1,1],6,7),"/",
+              substr(rep_per[1,1],9,10),"/",
+              substr(rep_per[1,1],1,4)," to ",
+              substr(rep_per[3,1],6,7),"/",
+              substr(rep_per[3,1],9,10),"/",
+              substr(rep_per[3,1],1,4))
 
 # Mount Sinai corporate colors "USE THIS TO ADD COLORS"
 MountSinai_colors <- c(
@@ -137,7 +157,7 @@ service_line <- function(hosp,service){
   library(tidyr)
   data_service <- data %>% #take pre-filtered data
     filter(PAYROLL == hosp, #filter on specific hospital
-           SERVICE.LINE == service) #filter on specific service line
+           CORPORATE.SERVICE.LINE == service) #filter on specific service line
   data_service <- data_service %>% 
     pivot_wider(id_cols = c("DEFINITION.CODE","DEFINITION.NAME","DEPARTMENT"),
                 names_from = "PP.END.DATE",
@@ -165,7 +185,7 @@ k <- function(hosp,service){
   library(tidyr)
   kdata <- data %>% 
     filter(PAYROLL == hosp, 
-           SERVICE.LINE == service) %>% 
+           CORPORATE.SERVICE.LINE == service) %>% 
     pivot_wider(id_cols = DEPARTMENT,
                 names_from = DATES,
                 values_from = FTE) 
@@ -190,9 +210,9 @@ k <- function(hosp,service){
 premier_sum_stats <- function(sys.sum, site, serv.line){
   data_export <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE, DATES) %>%
+    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE, DATES) %>%
     filter(PAYROLL == site,
-           SERVICE.LINE %in% serv.line) %>%
+           CORPORATE.SERVICE.LINE %in% serv.line) %>%
     group_by(PAYROLL,PP.END.DATE, DATES) %>%
     summarise(FTE = sum(FTE, na.rm = T)) %>%
     pivot_wider(id_cols = PAYROLL,
@@ -221,14 +241,14 @@ system_kable <- function(table){
 graph_data <- function(serv.line){
   data_service <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(SERVICE.LINE == serv.line) %>%
-    group_by(PAYROLL,SERVICE.LINE,PP.END.DATE,DATES) %>%
+    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(CORPORATE.SERVICE.LINE == serv.line) %>%
+    group_by(PAYROLL,CORPORATE.SERVICE.LINE,PP.END.DATE,DATES) %>%
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
   data_service <- data_service %>% 
-    pivot_wider(id_cols=c(PAYROLL,SERVICE.LINE),names_from = DATES,values_from = FTE)
+    pivot_wider(id_cols=c(PAYROLL,CORPORATE.SERVICE.LINE),names_from = DATES,values_from = FTE)
   data_service <- data_service[,c(1,2,(ncol(data_service)-9):ncol(data_service))]
   data_service <- data_service %>% 
     pivot_longer(cols = 3:ncol(data_service),
@@ -275,8 +295,8 @@ site_total <- function(){
 nursing_total <- function(nursing){
   data_service <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(SERVICE.LINE %in% nursing) %>%
+    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(CORPORATE.SERVICE.LINE %in% nursing) %>%
     group_by(PAYROLL,PP.END.DATE,DATES) %>%
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
@@ -301,8 +321,8 @@ nursing_total <- function(nursing){
 support_total <- function(support){
   data_service <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(SERVICE.LINE %in% support) %>%
+    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(CORPORATE.SERVICE.LINE %in% support) %>%
     group_by(PAYROLL,PP.END.DATE,DATES) %>%
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
@@ -354,11 +374,11 @@ system_total <- function(){
 corporate <- function(service){
   library(tidyr)
   data_service <- data %>% #take pre-filtered data
-    filter(SERVICE.LINE == service) %>% #filter on specific service line
+    filter(CORPORATE.SERVICE.LINE == service) %>% #filter on specific service line
     ungroup() %>%
-    select(SERVICE.LINE,PP.END.DATE,FTE,DATES) %>%
+    select(CORPORATE.SERVICE.LINE,PP.END.DATE,FTE,DATES) %>%
     arrange(PP.END.DATE) %>%
-    rename(DEPARTMENT = SERVICE.LINE)
+    rename(DEPARTMENT = CORPORATE.SERVICE.LINE)
   data_service <- data_service[(nrow(data_service)-9):nrow(data_service),]
   data_service$DATES <- factor(data_service$DATES)
   data_service <<- data_service
