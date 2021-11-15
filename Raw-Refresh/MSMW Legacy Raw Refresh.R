@@ -91,19 +91,31 @@ data_MSSL_MSW <- left_join(data_final, dict_payroll)
 if(nrow(data_MSSL_MSW) != row_count){
   stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
-
 # Cost Center ("Department") ---------------------------------------------
-data_MSSL_MSW$DPT.WRKD <- paste0(data_MSSL_MSW$WD_COFT,
-                                 data_MSSL_MSW$WD_Location,
-                                 data_MSSL_MSW$WD_Department)
-data_MSSL_MSW$DPT.HOME <- paste0(data_MSSL_MSW$HD_COFT,
-                                 data_MSSL_MSW$HD_Location,
-                                 data_MSSL_MSW$HD_Department)
+data_MSSL_MSW$DPT.WRKD.Legacy <- paste0(data_MSSL_MSW$WD_COFT,
+                                        data_MSSL_MSW$WD_Location,
+                                        data_MSSL_MSW$WD_Department)
+data_MSSL_MSW$DPT.HOME.Legacy <- paste0(data_MSSL_MSW$HD_COFT,
+                                        data_MSSL_MSW$HD_Location,
+                                        data_MSSL_MSW$HD_Department)
 
 # Add Oracle Cost Centers -------------------------------------------------
-data_MSSL_MSW_test <- left_join(data_MSSL_MSW, dict_cc_conversion,
-                                by = c("DPT.HOME" = "COST.CENTER.LEGACY",
-                                       "DPT.WRKD" = "COST.CENTER.ORACLE"))
+row_count <- nrow(data_MSSL_MSW)
+#Looking up oracle conversion for legacy home cost center
+data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_cc_conversion,
+                           by = c("DPT.HOME.Legacy" = "COST.CENTER.LEGACY"))
+
+#Looking up oracle conversion for legacy worked cost center
+data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_cc_conversion,
+                           by = c("DPT.WRKD.Legacy" = "COST.CENTER.LEGACY"))
+
+#Renaming columns
+data_MSSL_MSW <- data_MSSL %>%
+  rename(DPT.HOME = COST.CENTER.ORACLE.x,
+         DPT.WRKD = COST.CENTER.ORACLE.y)
+
+if(nrow(data_MSSL_MSW_test) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
 # Remove Duplicates -------------------------------------------------------
 data_MSSL_MSW <- data_MSSL_MSW %>% distinct()
