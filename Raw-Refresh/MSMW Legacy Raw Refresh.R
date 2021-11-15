@@ -29,8 +29,9 @@ list_data <- do.call("rbind", list_data)
 
 # Preprocessing Data ------------------------------------------------------
 dict_cc_conversion <- dict_cc_conversion %>%
-  filter(PAYROLL %in% c("MSM", "MSW")) %>%
-  select(COST.CENTER.LEGACY, COST.CENTER.ORACLE)
+  filter(PAYROLL %in% c("MSMW")) %>%
+  select(COST.CENTER.LEGACY, COST.CENTER.ORACLE) %>% 
+  distinct()
 
 data_RAW <- list_data %>% 
   mutate(`START DATE`= paste0(substr(`START DATE`,1,2), "/",
@@ -90,8 +91,19 @@ data_MSSL_MSW <- left_join(data_final, dict_payroll)
 if(nrow(data_MSSL_MSW) != row_count){
   stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
+
+# Cost Center ("Department") ---------------------------------------------
+data_MSSL_MSW$DPT.WRKD <- paste0(data_MSSL_MSW$WD_COFT,
+                                 data_MSSL_MSW$WD_Location,
+                                 data_MSSL_MSW$WD_Department)
+data_MSSL_MSW$DPT.HOME <- paste0(data_MSSL_MSW$HD_COFT,
+                                 data_MSSL_MSW$HD_Location,
+                                 data_MSSL_MSW$HD_Department)
+
 # Add Oracle Cost Centers -------------------------------------------------
-data_MSSL_MSW_test <- left_join(data_MSSL_MSW, dict_cc_conversion)
+data_MSSL_MSW_test <- left_join(data_MSSL_MSW, dict_cc_conversion,
+                                by = c("DPT.HOME" = "COST.CENTER.LEGACY",
+                                       "DPT.WRKD" = "COST.CENTER.ORACLE"))
 
 # Remove Duplicates -------------------------------------------------------
 data_MSSL_MSW <- data_MSSL_MSW %>% distinct()
