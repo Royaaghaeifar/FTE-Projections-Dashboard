@@ -12,6 +12,10 @@ dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
 dir_files <- paste0(here(),"/MSMW Legacy/MSMW Legacy")
 
 # Import Data -------------------------------------------------------------
+dict_cc_conversion <- read_xlsx(paste0(dir_universal,
+                                       "/Mapping",
+                                       "/MSHS_Code_Conversion_Mapping.xlsx"))
+
 list_data_files <- list.files(dir_files, pattern = "xlsx$", full.names = T)
 read_xlsx_files <- function(filename){
   dat <- read_xlsx(filename, sheet= "Export Worksheet")
@@ -24,6 +28,10 @@ list_data <-lapply(list_data_files, function(x) read_xlsx_files(x))
 list_data <- do.call("rbind", list_data)
 
 # Preprocessing Data ------------------------------------------------------
+dict_cc_conversion <- dict_cc_conversion %>%
+  filter(PAYROLL %in% c("MSM", "MSW")) %>%
+  select(COST.CENTER.LEGACY, COST.CENTER.ORACLE)
+
 data_RAW <- list_data %>% 
   mutate(`START DATE`= paste0(substr(`START DATE`,1,2), "/",
                               substr(`START DATE`,3,4), "/",
@@ -77,10 +85,13 @@ data_final$`Start-End` <- data_final$Source <- NULL
 dict_payroll <- data.table::data.table(PAYROLL = c('MSW', 'MSM'), `Facility Hospital Id_Worked` = c ('NY2162', 'NY2163'))
 #Checking row count before left join
 row_count <- nrow(data_final)
-data_MSSL_MSW <-left_join(data_final, dict_payroll)
+data_MSSL_MSW <- left_join(data_final, dict_payroll)
 #If rows added during left join stop executing code
 if(nrow(data_MSSL_MSW) != row_count){
   stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
+# Add Oracle Cost Centers -------------------------------------------------
+data_MSSL_MSW_test <- left_join(data_MSSL_MSW, dict_cc_conversion)
 
 # Remove Duplicates -------------------------------------------------------
 data_MSSL_MSW <- data_MSSL_MSW %>% distinct()
