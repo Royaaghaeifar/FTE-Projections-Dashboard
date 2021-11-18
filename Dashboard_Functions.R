@@ -15,7 +15,7 @@ worked_paycodes <- c('REGULAR','OVERTIME','OTHER_WORKED','EDUCATION','ORIENTATIO
 pre_covid_PP <- as.Date(c('2020-01-04','2020-01-18','2020-02-01','2020-02-15','2020-02-29'))
 #get unique service lines and sites
 service_lines <- c('IT', 'HR', 'CMO', 'Nursing - Administration', 'Nursing - Adolescent Psych' ,'Nursing - Adult Psych' ,'Nursing - Antepartum / Postpartum' ,'Nursing - Cardiology' ,'Nursing - Critical Care' ,'Nursing - Critical Care / Intermediate Care Blend' ,'Nursing - Critical Care Cardiac' ,'Nursing - Dialysis' ,'Nursing - Education' ,'Nursing - Emergency Department' ,'Nursing - Emergency Medicine' ,'Nursing - Intermediate Care' ,'Nursing - Labor & Delivery' ,'Nursing - Med Surg' ,'Nursing - Med Surg Intermediate Care Blend' ,'Nursing - Neonatal ICU' ,'Nursing - Observation' ,'Nursing - Palliative' ,'Nursing - Postpartum' ,'Nursing - Psych ED' ,'Nursing - Rehab' ,'Nursing - Telemetry Cardiac' ,'Nursing - Telemetry Med Surg' ,'Nursing - Telemetry Observation Blend' ,'Nursing' ,'Radiology - CT' ,'Radiology - CT/Diagnostic' ,'Radiology - Diagnostic' ,'Radiology - Interventional' ,'Radiology - Interventional/CT' ,'Radiology - Mammography' ,'Radiology - Mammography/Diagnostic' ,'Radiology - Mammography/Interventional' ,'Radiology - MRI' ,'Radiology - Nuclear Medicine' ,'Radiology - Nuclear Medicine/PET' ,'Radiology - PET/CT' ,'Radiology - Support' ,'Radiology - Ultrasound' ,'Support Services - Biomed / Clinical Engineering' ,'Support Services - Blood Bank' ,'Support Services - Clinical Nutrition' ,'Support Services - Engineering' ,'Support Services - Environmental Services' ,'Support Services - Food Services' ,'Support Services - Linen' ,'Support Services - Patient Transport' ,'Support Services - Safety' ,'Support Services - Security' ,'Perioperative Services' ,'Admitting' ,'Ambulatory - MSBI' ,'Ambulatory - MSDUS' ,'Cardiology' ,'Emergency Medicine' ,'Employee Health Services' ,'Lab' ,'Materials Management' ,'Medical Records' ,'Pharmacy' ,'Rehab' ,'Respiratory' ,'Supply Chain' ,'System CMO' ,'System CMO - Case Management' ,'Other')
-site_list <- c("Corporate", "MSH","MSQ","MSBI","MSB","MSM","MSW")
+site_list <- c("MSH","MSQ","MSBI","MSB","MSM","MSW", "Corporate")
 
 report_period_length <- 3
 biweekly_fte <- 75
@@ -224,21 +224,35 @@ system_kable <- function(table){
 }
 
 #System level service line graph
-graph_data <- function(serv.line){
-  data_service <- data %>% 
-    ungroup() %>%
-    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(CORPORATE.SERVICE.LINE == serv.line) %>%
-    group_by(PAYROLL,CORPORATE.SERVICE.LINE,PP.END.DATE,DATES) %>%
-    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
-    ungroup() %>%
-    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
-  data_service <- data_service %>% 
-    pivot_wider(id_cols=c(PAYROLL,CORPORATE.SERVICE.LINE),names_from = DATES,values_from = FTE)
-  data_service <- data_service[,c(1,2,(ncol(data_service)-9):ncol(data_service))]
-  data_service <- data_service %>% 
-    pivot_longer(cols = 3:ncol(data_service),
-                 names_to = "DATES")
+graph_data <- function(serv.line = service_lines){
+  if(all(serv.line == service_lines)){
+    data_service <- data %>% 
+      ungroup() %>%
+      select(PAYROLL,FTE,PP.END.DATE,DATES) %>%
+      group_by(PAYROLL,PP.END.DATE,DATES) %>%
+      summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+      ungroup()
+    data_service <- data_service %>% 
+      pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
+    data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
+    data_service <- data_service %>% 
+      pivot_longer(cols = 2:ncol(data_service),
+                   names_to = "DATES")
+  } else {
+    data_service <- data %>% 
+      ungroup() %>%
+      select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+      filter(CORPORATE.SERVICE.LINE %in% serv.line) %>%
+      group_by(PAYROLL,CORPORATE.SERVICE.LINE,PP.END.DATE,DATES) %>%
+      summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+      ungroup()
+    data_service <- data_service %>% 
+      pivot_wider(id_cols=c(PAYROLL,CORPORATE.SERVICE.LINE),names_from = DATES,values_from = FTE)
+    data_service <- data_service[,c(1,2,(ncol(data_service)-9):ncol(data_service))]
+    data_service <- data_service %>% 
+      pivot_longer(cols = 3:ncol(data_service),
+                   names_to = "DATES")
+  }
   data_service <- data_service %>% 
     mutate(FTE = case_when(
       is.na(value) ~ 0, #if FTE is NA -> 0
@@ -248,87 +262,67 @@ graph_data <- function(serv.line){
   data_service <<- data_service
   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
   service <- serv.line
-  graph_style(graph = system_line_graph,service = service,level="Site")
+  graph_style(graph = system_line_graph,
+              if(all(serv.line == service_lines)){
+                service = "Total"
+              } else {
+                service = service
+              },
+              level="Site")
 }
 
-#Site level total fte
-site_total <- function(){
-  data_service <- data %>% 
-    ungroup() %>%
-    select(PAYROLL,FTE,PP.END.DATE,DATES) %>%
-    group_by(PAYROLL,PP.END.DATE,DATES) %>%
-    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
-    ungroup() %>%
-    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM","Corporate")))
-  data_service <- data_service %>% 
-    pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
-  data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
-  data_service <- data_service %>% 
-    pivot_longer(cols = 2:ncol(data_service),
-                 names_to = "DATES")
-  data_service <- data_service %>% 
-    mutate(FTE = case_when(
-      is.na(value) ~ 0, #if FTE is NA -> 0
-      !is.na(value) ~ value), #else leave the value
-      FTE = round(value,digits_round)) %>%
-    rename(Site = PAYROLL)
-  data_service <<- data_service
-  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
-  graph_style(graph = system_line_graph,service = "Total",level="Site")
-}
-
-#Nursing total FTE
-nursing_total <- function(nursing){
-  data_service <- data %>% 
-    ungroup() %>%
-    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(CORPORATE.SERVICE.LINE %in% nursing) %>%
-    group_by(PAYROLL,PP.END.DATE,DATES) %>%
-    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
-    ungroup() %>%
-    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
-  data_service <- data_service %>% 
-    pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
-  data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
-  data_service <- data_service %>% 
-    pivot_longer(cols = 2:ncol(data_service),
-                 names_to = "DATES")
-  data_service <- data_service %>% 
-    mutate(FTE = case_when(
-      is.na(value) ~ 0, #if FTE is NA -> 0
-      !is.na(value) ~ value), #else leave the value
-      FTE = round(value,digits_round)) %>%
-    rename(Site = PAYROLL)
-  data_service <<- data_service
-  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
-  graph_style(graph = system_line_graph,service = "Total Nursing",level="Site")
-}
-#Support Services FTE
-support_total <- function(support){
-  data_service <- data %>% 
-    ungroup() %>%
-    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(CORPORATE.SERVICE.LINE %in% support) %>%
-    group_by(PAYROLL,PP.END.DATE,DATES) %>%
-    summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
-    ungroup() %>%
-    mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
-  data_service <- data_service %>% 
-    pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
-  data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
-  data_service <- data_service %>% 
-    pivot_longer(cols = 2:ncol(data_service),
-                 names_to = "DATES")
-  data_service <- data_service %>% 
-    mutate(FTE = case_when(
-      is.na(value) ~ 0, #if FTE is NA -> 0
-      !is.na(value) ~ value), #else leave the value
-      FTE = round(value,digits_round)) %>%
-    rename(Site = PAYROLL)
-  data_service <<- data_service
-  system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
-  graph_style(graph = system_line_graph,service = "Total Support Services",level="Site")
-}
+# #Nursing total FTE
+# nursing_total <- function(nursing){
+#   data_service <- data %>% 
+#     ungroup() %>%
+#     select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+#     filter(CORPORATE.SERVICE.LINE %in% nursing) %>%
+#     group_by(PAYROLL,PP.END.DATE,DATES) %>%
+#     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+#     ungroup() %>%
+#     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+#   data_service <- data_service %>% 
+#     pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
+#   data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
+#   data_service <- data_service %>% 
+#     pivot_longer(cols = 2:ncol(data_service),
+#                  names_to = "DATES")
+#   data_service <- data_service %>% 
+#     mutate(FTE = case_when(
+#       is.na(value) ~ 0, #if FTE is NA -> 0
+#       !is.na(value) ~ value), #else leave the value
+#       FTE = round(value,digits_round)) %>%
+#     rename(Site = PAYROLL)
+#   data_service <<- data_service
+#   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
+#   graph_style(graph = system_line_graph,service = "Total Nursing",level="Site")
+# }
+# #Support Services FTE
+# support_total <- function(support){
+#   data_service <- data %>% 
+#     ungroup() %>%
+#     select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+#     filter(CORPORATE.SERVICE.LINE %in% support) %>%
+#     group_by(PAYROLL,PP.END.DATE,DATES) %>%
+#     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
+#     ungroup() %>%
+#     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
+#   data_service <- data_service %>% 
+#     pivot_wider(id_cols=PAYROLL,names_from = DATES,values_from = FTE)
+#   data_service <- data_service[,c(1,(ncol(data_service)-9):ncol(data_service))]
+#   data_service <- data_service %>% 
+#     pivot_longer(cols = 2:ncol(data_service),
+#                  names_to = "DATES")
+#   data_service <- data_service %>% 
+#     mutate(FTE = case_when(
+#       is.na(value) ~ 0, #if FTE is NA -> 0
+#       !is.na(value) ~ value), #else leave the value
+#       FTE = round(value,digits_round)) %>%
+#     rename(Site = PAYROLL)
+#   data_service <<- data_service
+#   system_line_graph <- ggplot(data = data_service, aes(x=DATES,y=FTE,group=Site,color=Site))
+#   graph_style(graph = system_line_graph,service = "Total Support Services",level="Site")
+# }
 
 #System total FTE
 system_total <- function(){
