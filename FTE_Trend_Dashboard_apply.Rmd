@@ -34,10 +34,9 @@ sites_services_df <- data %>%
   select(PAYROLL, CORPORATE.SERVICE.LINE) %>% 
   filter(!is.na(PAYROLL)) %>% 
   distinct()
-sites <- unique(sites_services_df$PAYROLL)
-render_list <- sapply(X = sites,
+render_list <- sapply(X = site_list,
                      function(x) {
-                       site_service_lines <<- sites_services_df %>%
+                       site_service_lines <- sites_services_df %>%
                          filter(PAYROLL == x)
                        list(h2(x),
                             sapply(X = unique(site_service_lines$CORPORATE.SERVICE.LINE),
