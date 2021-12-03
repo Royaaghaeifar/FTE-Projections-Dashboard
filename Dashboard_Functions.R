@@ -10,12 +10,55 @@ System_Summary <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Produc
 #########################################################################################
 
 #Worked hour pay code mappings
-worked_paycodes <- c('REGULAR','OVERTIME','OTHER_WORKED','EDUCATION','ORIENTATION','AGENCY')
+worked_paycodes <- c('REGULAR', 'OVERTIME', 'OTHER_WORKED', 'EDUCATION',
+                     'ORIENTATION', 'AGENCY')
 #pre covid pay period end dates
-pre_covid_PP <- as.Date(c('2020-01-04','2020-01-18','2020-02-01','2020-02-15','2020-02-29'))
-#get unique service lines and sites
-service_lines <- c('IT', 'HR', 'CMO', 'Nursing - Administration', 'Nursing - Adolescent Psych' ,'Nursing - Adult Psych' ,'Nursing - Antepartum / Postpartum' ,'Nursing - Cardiology' ,'Nursing - Critical Care' ,'Nursing - Critical Care / Intermediate Care Blend' ,'Nursing - Critical Care Cardiac' ,'Nursing - Dialysis' ,'Nursing - Education' ,'Nursing - Emergency Department' ,'Nursing - Emergency Medicine' ,'Nursing - Intermediate Care' ,'Nursing - Labor & Delivery' ,'Nursing - Med Surg' ,'Nursing - Med Surg Intermediate Care Blend' ,'Nursing - Neonatal ICU' ,'Nursing - Observation' ,'Nursing - Palliative' ,'Nursing - Postpartum' ,'Nursing - Psych ED' ,'Nursing - Rehab' ,'Nursing - Telemetry Cardiac' ,'Nursing - Telemetry Med Surg' ,'Nursing - Telemetry Observation Blend' ,'Nursing' ,'Radiology - CT' ,'Radiology - CT/Diagnostic' ,'Radiology - Diagnostic' ,'Radiology - Interventional' ,'Radiology - Interventional/CT' ,'Radiology - Mammography' ,'Radiology - Mammography/Diagnostic' ,'Radiology - Mammography/Interventional' ,'Radiology - MRI' ,'Radiology - Nuclear Medicine' ,'Radiology - Nuclear Medicine/PET' ,'Radiology - PET/CT' ,'Radiology - Support' ,'Radiology - Ultrasound' ,'Support Services - Biomed / Clinical Engineering' ,'Support Services - Blood Bank' ,'Support Services - Clinical Nutrition' ,'Support Services - Engineering' ,'Support Services - Environmental Services' ,'Support Services - Food Services' ,'Support Services - Linen' ,'Support Services - Patient Transport' ,'Support Services - Safety' ,'Support Services - Security' ,'Perioperative Services' ,'Admitting' ,'Ambulatory - MSBI' ,'Ambulatory - MSDUS' ,'Cardiology' ,'Emergency Medicine' ,'Employee Health Services' ,'Lab' ,'Materials Management' ,'Medical Records' ,'Pharmacy' ,'Rehab' ,'Respiratory' ,'Supply Chain' ,'System CMO' ,'System CMO - Case Management' ,'Other')
-site_list <- c("MSH","MSQ","MSBI","MSB","MSM","MSW", "Corporate")
+pre_covid_PP <- as.Date(c('2020-01-04', '2020-01-18', '2020-02-01',
+                          '2020-02-15','2020-02-29'))
+####get unique service lines and sites####
+service_lines <- c('Nursing - Administration', 'Nursing - Adolescent Psych', 
+                   'Nursing - Adult Psych', 'Nursing - Antepartum / Postpartum',
+                   'Nursing - Cardiology',
+                   'Nursing - Critical Care',
+                   'Nursing - Critical Care / Intermediate Care Blend',
+                   'Nursing - Critical Care Cardiac', 'Nursing - Dialysis',
+                   'Nursing - Education', 'Nursing - Emergency Department',
+                   'Nursing - Emergency Medicine',
+                   'Nursing - Intermediate Care', 'Nursing - Labor & Delivery',
+                   'Nursing - Med Surg',
+                   'Nursing - Med Surg Intermediate Care Blend',
+                   'Nursing - Neonatal ICU', 'Nursing - Observation',
+                   'Nursing - Palliative', 'Nursing - Postpartum',
+                   'Nursing - Psych ED', 'Nursing - Rehab',
+                   'Nursing - Telemetry Cardiac',
+                   'Nursing - Telemetry Med Surg',
+                   'Nursing - Telemetry Observation Blend', 'Nursing',
+                   'Radiology - CT', 'Radiology - CT/Diagnostic',
+                   'Radiology - Diagnostic', 'Radiology - Interventional',
+                   'Radiology - Interventional/CT', 'Radiology - Mammography',
+                   'Radiology - Mammography/Diagnostic',
+                   'Radiology - Mammography/Interventional', 'Radiology - MRI',
+                   'Radiology - Nuclear Medicine',
+                   'Radiology - Nuclear Medicine/PET', 'Radiology - PET/CT',
+                   'Radiology - Support', 'Radiology - Ultrasound',
+                   'Support Services - Biomed / Clinical Engineering',
+                   'Support Services - Blood Bank',
+                   'Support Services - Clinical Nutrition',
+                   'Support Services - Engineering',
+                   'Support Services - Environmental Services',
+                   'Support Services - Food Services',
+                   'Support Services - Linen',
+                   'Support Services - Patient Transport',
+                   'Support Services - Safety', 'Support Services - Security',
+                   'Perioperative Services', 'Admitting', 'Ambulatory - MSBI',
+                   'Ambulatory - MSDUS', 'Cardiology', 'Emergency Medicine',
+                   'Employee Health Services', 'Lab', 'Materials Management',
+                   'Medical Records', 'Pharmacy', 'Rehab', 'Respiratory',
+                   'Supply Chain', 'System CMO', 'System CMO - Case Management',
+                   'Other')
+####end####
+
+site_list <- c("MSH", "MSQ", "MSBI", "MSB", "MSM", "MSW", "Corporate")
 
 report_period_length <- 3
 biweekly_fte <- 75
