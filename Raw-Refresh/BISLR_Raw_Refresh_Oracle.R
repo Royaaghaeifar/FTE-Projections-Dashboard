@@ -18,9 +18,9 @@ filter_end_dates <- c("2021-04-03", "2021-05-01", "2021-05-29", "2021-06-26",
 weekly_pc <- c("WEST WEEKLY", "BIB WEEKLY")
 
 #Paths
-dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
-                        "/Productivity/Universal Data")
-dir_files <- paste0(here(), "/BISLR Oracle/BISLR Oracle/")
+dir_universal <- paste0("/SharedDrive/data/deans/Presidents/SixSigma",
+                        "/MSHS Productivity/Productivity/Universal Data")
+dir_files <- paste0(dir_universal, "/Labor/Raw Data/BISLR Oracle/")
 #Legacy raw refresh to include the deleted weekly cycle 2/28/21 - 3/6/21
 
 # Import Data -------------------------------------------------------------
