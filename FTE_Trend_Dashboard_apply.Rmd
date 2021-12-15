@@ -22,10 +22,8 @@ source("Dashboard_Functions.R")
 ```
 
 #### Reporting Period: `r rep`
-#### Baseline Period: 12/22/2019 to 02/29/2020
 #### * Department does not currently have a Premier productivity report
 #### 1 FTE = 75 Worked Hours/Pay Period
-## Mount Sinai Health System
 
 ```{r, echo=F,warning=F,message=F, results=F}
 library(htmltools)
@@ -34,25 +32,35 @@ sites_services_df <- data %>%
   select(PAYROLL, CORPORATE.SERVICE.LINE) %>% 
   filter(!is.na(PAYROLL)) %>% 
   distinct()
-render_list <- sapply(X = site_list,
-                     function(x) {
-                       site_service_lines <- sites_services_df %>%
-                         filter(PAYROLL == x)
-                       list(h2(x),
-                            sapply(X = unique(site_service_lines$CORPORATE.SERVICE.LINE),
-                                   function(y) {
-                                     list(h3(y),
-                                          service_line(hosp = x, service = y),
-                                          HTML(k(hosp = x, service = y)))
-                                   },
-                                   simplify = FALSE,
-                                   USE.NAMES = TRUE
-                            )
-                       )
-                     },
-                     simplify = FALSE,
-                     USE.NAMES = TRUE
-)
+system_service_lines <- 
+  service_lines[which(!service_lines %in% c("IT", "HR", "CMO"))]
+  
+render_list <- list(h2("Mount Sinai Health System"),
+                    sapply(X = system_service_lines,
+                           function(x) {
+                             list(h3(x),
+                                  graph_data(serv.line = x),
+                                  HTML(k(service = x)))},
+                           simplify = FALSE,
+                           USE.NAMES = TRUE),
+                    sapply(X = site_list, function(y) {
+                      site_service_lines <- sites_services_df %>%
+                        filter(PAYROLL == y)
+                      list(h2(y),
+                           sapply(X = unique(
+                             site_service_lines$CORPORATE.SERVICE.LINE),
+                                  function(z) {
+                                    list(h3(z),
+                                         graph_data(hosp = y, serv.line = z),
+                                         HTML(k(hosp = y, service = z)))
+                                  },
+                                  simplify = TRUE,
+                                  USE.NAMES = TRUE
+                                  )
+                           )
+                    },
+                    simplify = TRUE,
+                    USE.NAMES = TRUE))
 ```
 
 ```{r, echo=F,warning=F,message=F,fig.width=12, results='asis'}
