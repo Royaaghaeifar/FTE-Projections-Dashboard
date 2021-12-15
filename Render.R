@@ -7,7 +7,7 @@ library(here)
 source("System_Summary.R")
 
 #Enter max PP end date for dashboard
-end <- "09/25/2021"
+end <- "10/23/2021"
 
 #Save System Summary table
 saveRDS(System_Summary,file=paste0("J:/deans/Presidents/SixSigma/",
@@ -25,9 +25,9 @@ saveRDS(System_Summary %>%
                                    "System_Summary_Dashboard.rds"))
 
 #render FTE Trend Dashboard
-render("FTE_Trend_Dashboard.rmd")
+render("FTE_Trend_Dashboard_apply.rmd")
 
 #Archive the FTE Trend Dashboard with date of max pay period
-file.copy(paste0(here(),"/FTE_Trend_Dashboard.html"),"J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards")
-file.rename("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard.html",
+file.copy(paste0(here(),"/FTE_Trend_Dashboard_apply.html"),"J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards")
+file.rename("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard_apply.html",
             paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard_",as.Date(end,format="%m/%d/%Y"),".html"))
