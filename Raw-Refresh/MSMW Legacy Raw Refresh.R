@@ -7,7 +7,7 @@ library(here)
 library(rstudioapi)
 
 # Constants ---------------------------------------------------------------
-dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
+dir_universal <- paste0("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity",
                         "/Productivity/Universal Data")
 dir_files <- paste0(here(),"/MSMW Legacy/MSMW Legacy")
 

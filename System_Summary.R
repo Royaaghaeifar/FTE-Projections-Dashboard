@@ -18,6 +18,6 @@ System_Summary = do.call("rbind",System_Summary_List)
 Error_Report <- filter(System_Summary,is.na(PAYROLL)|is.na(J.C)|is.na(J.C.DESCRIPTION)|is.na(PAY.CODE.MAPPING)|is.na(PROVIDER))
 #Save error report
 library(xlsx)
-write.xlsx(Error_Report,paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Error Reports/Error_Report_",Sys.Date(),".xlsx"))
+write.xlsx(Error_Report,paste0("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Error Reports/Error_Report_",Sys.Date(),".xlsx"))
 #########################################################################################
 

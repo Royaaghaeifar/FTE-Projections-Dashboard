@@ -3,7 +3,7 @@ library(readxl)
 library(rstudioapi)
 
 #universal directory
-universal_dir <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
+universal_dir <- paste0("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/",
                         "Productivity/Universal Data/")
 
 #Read in raw MSHQ Oracle raw refresh
@@ -11,7 +11,7 @@ data_MSH_MSQ_oracle <- readRDS(paste0(universal_dir,
                                       "Labor/RDS/data_MSH_MSQ_oracle.rds"))
 
 #Read COA for department location
-COA <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",
+COA <- read.csv("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",
                 header = T, stringsAsFactors = F, strip.white = TRUE)
 
 #Read in job code descriptions

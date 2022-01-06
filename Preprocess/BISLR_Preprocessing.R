@@ -3,7 +3,7 @@ library(tidyverse)
 library(xlsx)
 
 # Constants ---------------------------------------------------------------
-dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
+dir_universal <- paste0("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity",
                         "/Productivity/Universal Data")
 
 # Load Data ---------------------------------------------------------------

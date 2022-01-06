@@ -67,7 +67,7 @@ MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4408" & MS
 MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4409" & MSBIB_raw_data$WD_Location == "03" & MSBIB_raw_data$WD_Department == "4268" & MSBIB_raw_data$`Employee Name` == "WALKER, THERESA L"] <- "DUS_REMOVE"
 MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4409" & MSBIB_raw_data$WD_Location == "03" & MSBIB_raw_data$WD_Department == "4268" & MSBIB_raw_data$`Employee Name` == "WALKER, THERESA L (Lauren)"] <- "DUS_REMOVE"
 
-RDS_path <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/"
+RDS_path <- "/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/"
 saveRDS(MSBIB_raw_data, file = paste0(RDS_path, "data_MSBI_MSB.rds"))
 
 rm(dir, dir_raw, MSBIB_file_list, MSBIB_data_list, MSBIB_raw_data, RDS_path)
