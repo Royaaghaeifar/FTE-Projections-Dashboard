@@ -25,7 +25,7 @@ saveRDS(System_Summary %>%
                                    "System_Summary_Dashboard.rds"))
 
 #render FTE Trend Dashboard
-render("FTE_Trend_Dashboard_apply.rmd")
+render("FTE_Trend_Dashboard_apply.Rmd")
 
 #Archive the FTE Trend Dashboard with date of max pay period
 file.copy(paste0(here(),"/FTE_Trend_Dashboard_apply.html"),"J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards")
