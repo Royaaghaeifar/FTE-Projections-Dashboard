@@ -2,13 +2,13 @@ library(tidyverse)
 library(readxl)
 library(rstudioapi)
 
-universal_dir <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
+universal_dir <- paste0("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/",
                         "Productivity/Universal Data/")
 
 data_MSH_MSQ <- readRDS(paste0(universal_dir,"Labor/RDS/data_MSH_MSQ.rds"))
 
 #Read COA for department names
-COA <- read.csv("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",
+COA <- read.csv("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",
                 header = T, stringsAsFactors = F, strip.white = TRUE)
 
 #Read in job code descriptions

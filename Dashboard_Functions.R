@@ -6,7 +6,7 @@ library(knitr)
 library(kableExtra)
 
 ##Reload Master##########################################################################
-System_Summary <- readRDS("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/System_Summary_Dashboard.rds")
+System_Summary <- readRDS("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/System_Summary_Dashboard.rds")
 #########################################################################################
 
 #Worked hour pay code mappings

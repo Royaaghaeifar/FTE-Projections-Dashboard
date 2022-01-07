@@ -7,7 +7,7 @@ library(readxl)
 library(rstudioapi)
 
 univ_ref <- paste0(
-  "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/",
+  "/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/",
   "Universal Data/"
 )
 

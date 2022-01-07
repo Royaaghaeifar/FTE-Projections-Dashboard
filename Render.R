@@ -10,7 +10,7 @@ source("System_Summary.R")
 end <- "10/23/2021"
 
 #Save System Summary table
-saveRDS(System_Summary,file=paste0("J:/deans/Presidents/SixSigma/",
+saveRDS(System_Summary,file=paste0("/SharedDrive/data/deans/Presidents/SixSigma/",
                                    "MSHS Productivity/Productivity/",
                                    "Universal Data/Labor/RDS/",
                                    "System_Summary.rds"))
@@ -19,7 +19,7 @@ saveRDS(System_Summary %>%
           filter(PP.END.DATE >= as.Date("12/22/2019",format="%m/%d/%Y"),
                  PP.END.DATE <= as.Date(end,format="%m/%d/%Y")) %>%
           replace_na(list(CORPORATE.SERVICE.LINE = "Other")),
-        file=paste0("J:/deans/Presidents/SixSigma/",
+        file=paste0("/SharedDrive/data/deans/Presidents/SixSigma/",
                                    "MSHS Productivity/Productivity/",
                                    "Universal Data/Labor/RDS/",
                                    "System_Summary_Dashboard.rds"))
@@ -28,6 +28,6 @@ saveRDS(System_Summary %>%
 render("FTE_Trend_Dashboard_apply.Rmd")
 
 #Archive the FTE Trend Dashboard with date of max pay period
-file.copy(paste0(here(),"/FTE_Trend_Dashboard_apply.html"),"J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards")
-file.rename("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard_apply.html",
-            paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard_",as.Date(end,format="%m/%d/%Y"),".html"))
+file.copy(paste0(here(),"/FTE_Trend_Dashboard_apply.html"),"/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards")
+file.rename("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard_apply.html",
+            paste0("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FTE Projections Dashboard/Dashboards/FTE_Trend_Dashboard_",as.Date(end,format="%m/%d/%Y"),".html"))

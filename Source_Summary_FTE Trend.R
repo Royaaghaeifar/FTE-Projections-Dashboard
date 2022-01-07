@@ -7,14 +7,14 @@ Source_Summary <- function(data){
   library(readxl)
   library(rstudioapi)
   #Read paycode mapping file and Pay cycle file
-  System_Paycode <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Paycode_Mapping.xlsx")
+  System_Paycode <- read_xlsx("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Paycode_Mapping.xlsx")
   System_Paycode <- System_Paycode %>% select(RAW.PAY.CODE, PAY.CODE.NAME,
                                               PAY.CODE.CATEGORY, INCLUDE.HOURS, 
                                               INCLUDE.EXPENSES)
   colnames(System_Paycode) <- c("PAY.CODE","PAY.CODE.NAME","PAY.CODE.MAPPING","INCLUDE.HOURS","INCLUDE.EXPENSES")
   
   #Read in paycycle
-  PayCycle <- read_excel("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Pay_Cycle.xlsx")
+  PayCycle <- read_excel("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Pay_Cycle.xlsx")
   PayCycle <- PayCycle %>%
     mutate(DATE = as.Date(DATE),
            START.DATE = as.Date(START.DATE),
@@ -46,7 +46,7 @@ Source_Summary <- function(data){
     stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
   
   #Bring in cost center mappings
-  System_Department <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Reporting_Definition_Mapping.xlsx")
+  System_Department <- read_xlsx("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Reporting_Definition_Mapping.xlsx")
   System_Department <- System_Department %>%
     filter(FTE.TREND == 1) %>%
     select(COST.CENTER, DEFINITION.CODE, DEFINITION.NAME, CORPORATE.SERVICE.LINE, SITE)
@@ -62,7 +62,7 @@ Source_Summary <- function(data){
     stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
   
   #Bring in Provider Column
-  System_Jobcode <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Jobcode_Mapping.xlsx")
+  System_Jobcode <- read_xlsx("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Jobcode_Mapping.xlsx")
   System_Jobcode <- System_Jobcode %>%
     select(PAYROLL,J.C, PROVIDER) %>%
     distinct()
