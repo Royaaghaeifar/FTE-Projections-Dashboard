@@ -10,7 +10,7 @@ System_Summary <- readRDS("/SharedDrive/data/deans/Presidents/SixSigma/MSHS Prod
 System_Summary <- System_Summary %>%
   filter(PP.END.DATE >= as.Date("12/22/2019",format="%m/%d/%Y"),
          PP.END.DATE <= as.Date(end,format="%m/%d/%Y")) %>%
-  replace_na(list(SERVICE.LINE = "Other"))
+  replace_na(list(CORPORATE.SERVICE.LINE = "Other"))
 #########################################################################################
 
 #Worked hour pay code mappings
@@ -43,9 +43,9 @@ data <- System_Summary %>%
          PROVIDER == 0, #remove providers
          INCLUDE.HOURS == 1, #only use included hour paycodes
          PAY.CODE.MAPPING %in% worked_paycodes) %>% #remove unproductive paycodes 
-  group_by(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,SERVICE.LINE,PP.END.DATE) %>%
+  group_by(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,CORPORATE.SERVICE.LINE,PP.END.DATE) %>%
   summarise(FTE = sum(HOURS, na.rm = T)/biweekly_fte) %>% #calculate FTE
-  pivot_wider(id_cols = c(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,SERVICE.LINE),values_from = FTE,names_from = PP.END.DATE)
+  pivot_wider(id_cols = c(PAYROLL,DEFINITION.CODE,DEFINITION.NAME,CORPORATE.SERVICE.LINE),values_from = FTE,names_from = PP.END.DATE)
 data[,4:ncol(data)][is.na(data[,4:ncol(data)])] <- 0
 data <- data %>%
   pivot_longer(cols = 5:ncol(data),names_to = "PP.END.DATE", values_to = "FTE")
@@ -141,7 +141,7 @@ service_line <- function(hosp,service){
   library(tidyr)
   data_service <- data %>% #take pre-filtered data
     filter(PAYROLL == hosp, #filter on specific hospital
-           SERVICE.LINE == service) #filter on specific service line
+           CORPORATE.SERVICE.LINE == service) #filter on specific service line
   data_service <- data_service %>% 
     pivot_wider(id_cols = c("DEFINITION.CODE","DEFINITION.NAME","DEPARTMENT"),
                 names_from = "PP.END.DATE",
@@ -169,7 +169,7 @@ k <- function(hosp,service){
   library(tidyr)
   kdata <- data %>% 
     filter(PAYROLL == hosp, 
-           SERVICE.LINE == service) %>% 
+           CORPORATE.SERVICE.LINE == service) %>% 
     pivot_wider(id_cols = DEPARTMENT,
                 names_from = DATES,
                 values_from = FTE) 
@@ -194,9 +194,9 @@ k <- function(hosp,service){
 premier_sum_stats <- function(sys.sum, site, serv.line){
   data_export <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE, DATES) %>%
+    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE, DATES) %>%
     filter(PAYROLL == site,
-           SERVICE.LINE %in% serv.line) %>%
+           CORPORATE.SERVICE.LINE %in% serv.line) %>%
     group_by(PAYROLL,PP.END.DATE, DATES) %>%
     summarise(FTE = sum(FTE, na.rm = T)) %>%
     pivot_wider(id_cols = PAYROLL,
@@ -225,14 +225,14 @@ system_kable <- function(table){
 graph_data <- function(serv.line){
   data_service <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(SERVICE.LINE == serv.line) %>%
-    group_by(PAYROLL,SERVICE.LINE,PP.END.DATE,DATES) %>%
+    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(CORPORATE.SERVICE.LINE == serv.line) %>%
+    group_by(PAYROLL,CORPORATE.SERVICE.LINE,PP.END.DATE,DATES) %>%
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
     mutate(PAYROLL = factor(PAYROLL,levels=c("MSH","MSQ","MSBI","MSB","MSW","MSM")))
   data_service <- data_service %>% 
-    pivot_wider(id_cols=c(PAYROLL,SERVICE.LINE),names_from = DATES,values_from = FTE)
+    pivot_wider(id_cols=c(PAYROLL,CORPORATE.SERVICE.LINE),names_from = DATES,values_from = FTE)
   data_service <- data_service[,c(1,2,(ncol(data_service)-9):ncol(data_service))]
   data_service <- data_service %>% 
     pivot_longer(cols = 3:ncol(data_service),
@@ -279,8 +279,8 @@ site_total <- function(){
 nursing_total <- function(nursing){
   data_service <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(SERVICE.LINE %in% nursing) %>%
+    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(CORPORATE.SERVICE.LINE %in% nursing) %>%
     group_by(PAYROLL,PP.END.DATE,DATES) %>%
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
@@ -305,8 +305,8 @@ nursing_total <- function(nursing){
 support_total <- function(support){
   data_service <- data %>% 
     ungroup() %>%
-    select(PAYROLL,SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
-    filter(SERVICE.LINE %in% support) %>%
+    select(PAYROLL,CORPORATE.SERVICE.LINE,FTE,PP.END.DATE,DATES) %>%
+    filter(CORPORATE.SERVICE.LINE %in% support) %>%
     group_by(PAYROLL,PP.END.DATE,DATES) %>%
     summarise(FTE = round(sum(FTE, na.rm = T),digits_round)) %>%
     ungroup() %>%
@@ -358,11 +358,11 @@ system_total <- function(){
 corporate <- function(service){
   library(tidyr)
   data_service <- data %>% #take pre-filtered data
-    filter(SERVICE.LINE == service) %>% #filter on specific service line
+    filter(CORPORATE.SERVICE.LINE == service) %>% #filter on specific service line
     ungroup() %>%
-    select(SERVICE.LINE,PP.END.DATE,FTE,DATES) %>%
+    select(CORPORATE.SERVICE.LINE,PP.END.DATE,FTE,DATES) %>%
     arrange(PP.END.DATE) %>%
-    rename(DEPARTMENT = SERVICE.LINE)
+    rename(DEPARTMENT = CORPORATE.SERVICE.LINE)
   data_service <- data_service[(nrow(data_service)-9):nrow(data_service),]
   data_service$DATES <- factor(data_service$DATES)
   data_service <<- data_service
