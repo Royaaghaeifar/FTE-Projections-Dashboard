@@ -27,9 +27,18 @@ oracle <- data_MSH_MSQ_oracle %>%
     TRUE ~ Reverse.Map.for.Worked),
     Reverse.Map.for.Home = case_when(
       Reverse.Map.for.Home == "" ~ paste0(HD_COFT,HD_Location,HD_Department),
-      TRUE ~ Reverse.Map.for.Home))
+      TRUE ~ Reverse.Map.for.Home)) %>%
+  #Build full COA for oracle home department
+  mutate(Department.ID.Home.Department = paste0(substr(Full.COA.for.Home,
+                                                1,3),
+                                         substr(Full.COA.for.Home,
+                                                41,44),
+                                         substr(Full.COA.for.Home,
+                                                5,7),
+                                         substr(Full.COA.for.Home,
+                                                12,16)))
 
-#Take first 8 digits of Home and Worked department
+#Take first 8 digits of Home and Worked department for reverse map
 oracle <- oracle %>%
   mutate(
     Reverse.Map.for.Worked =
@@ -67,15 +76,15 @@ oracle <- oracle %>%
          Hours = as.numeric(Hours),
          Expense = as.numeric(Expense))
 #Column names
-colnames(oracle)[c(6,7,12:15,29,30,32,33,35:37)] = c("START.DATE","END.DATE",
-                                                     "J.C","PAY.CODE",
-                                                     "HOME.DESCRIPTION",
-                                                     "WRKD.DESCRIPTION",
-                                                     "DPT.WRKD","DPT.HOME",
-                                                     "HOURS","EXPENSE",
-                                                     "WRKD.LOCATION",
-                                                     "HOME.LOCATION",
-                                                     "J.C.DESCRIPTION")
+colnames(oracle)[c(3,5,6,7,12:15,32,33,35:37)] = c("DPT.WRKD","DPT.HOME",
+                                                   "START.DATE","END.DATE",
+                                                   "J.C","PAY.CODE",
+                                                   "HOME.DESCRIPTION",
+                                                   "WRKD.DESCRIPTION",
+                                                   "HOURS","EXPENSE",
+                                                   "WRKD.LOCATION",
+                                                   "HOME.LOCATION",
+                                                   "J.C.DESCRIPTION")
 
 data_MSH_MSQ_oracle <<- oracle
 
