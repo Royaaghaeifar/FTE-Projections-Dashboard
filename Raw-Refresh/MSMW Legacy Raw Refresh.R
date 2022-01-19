@@ -110,12 +110,21 @@ data_MSSL_MSW <- left_join(data_MSSL_MSW, dict_cc_conversion,
                            by = c("DPT.WRKD.Legacy" = "COST.CENTER.LEGACY"))
 
 #Renaming columns
-data_MSSL_MSW <- data_MSSL %>%
+data_MSSL_MSW <- data_MSSL_MSW %>%
   rename(DPT.HOME = COST.CENTER.ORACLE.x,
          DPT.WRKD = COST.CENTER.ORACLE.y)
 
-if(nrow(data_MSSL_MSW_test) != row_count){
+if(nrow(data_MSSL_MSW) != row_count){
   stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
+#If there is no Oracle format use the Legacy cost center
+data_test <- data_MSSL_MSW %>%
+  mutate(DPT.HOME = case_when(
+    is.na(DPT.HOME) ~ DPT.HOME.Legacy,
+    TRUE ~ DPT.HOME),
+    DPT.WRKD = case_when(
+      is.na(DPT.WRKD) ~ DPT.WRKD.Legacy,
+      TRUE ~ DPT.WRKD))
 
 # Remove Duplicates -------------------------------------------------------
 data_MSSL_MSW <- data_MSSL_MSW %>% distinct()
