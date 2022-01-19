@@ -104,6 +104,14 @@ MSBIB_raw_data <- MSBIB_raw_data %>%
 if(nrow(MSBIB_raw_data) != row_count){
   stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
+MSBIB_raw_data <- MSBIB_raw_data %>%
+  mutate(DPT.HOME = case_when(
+    is.na(DPT.HOME) ~ DPT.HOME.Legacy,
+    TRUE ~ DPT.HOME),
+    DPT.WRKD = case_when(
+      is.na(DPT.WRKD) ~ DPT.WRKD.Legacy,
+      TRUE ~ DPT.WRKD))
+
 RDS_path <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/"
 
 saveRDS(MSBIB_raw_data, file = paste0(RDS_path, "data_MSBI_MSB.rds"))
