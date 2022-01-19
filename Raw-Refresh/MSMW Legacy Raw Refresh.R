@@ -30,10 +30,10 @@ list_data <- do.call("rbind", list_data)
 # Preprocessing Data ------------------------------------------------------
 dict_cc_conversion <- dict_cc_conversion %>%
   filter(PAYROLL %in% c("MSMW")) %>%
-  select(COST.CENTER.LEGACY, COST.CENTER.ORACLE) %>% 
+  select(COST.CENTER.LEGACY, COST.CENTER.ORACLE) %>%
   distinct()
 
-data_RAW <- list_data %>% 
+data_RAW <- list_data %>%
   mutate(`START DATE`= paste0(substr(`START DATE`,1,2), "/",
                               substr(`START DATE`,3,4), "/",
                               substr(`START DATE`,5,8)),
@@ -44,21 +44,21 @@ data_RAW <- list_data %>%
          `END DATE` = as.Date(`END DATE`, "%m/%d/%Y"),
          `Start-End` = paste0(`START DATE`, "-", `END DATE`))
 #Filtering each file by dates uploaded into Premier
-data_RAW_a <- data_RAW %>% 
+data_RAW_a <- data_RAW %>%
   filter(Source == "MSSLW_JAN_DEC19 and JAN_APR20 (1).xlsx"| Source == "MSSLW_JAN_DEC19 and JAN_APR20 (2).xlsx",
          `END DATE` <= as.Date('2020-03-28'))
-data_RAW_b <- data_RAW %>% 
+data_RAW_b <- data_RAW %>%
   filter(Source == "FEMA_MSSLW_APR_MAY_JUN_2020.xlsx",
          `END DATE` >= as.Date('2020-04-04') | `END DATE` < as.Date('2020-06-06'))
-data_RAW_c <- data_RAW %>% 
+data_RAW_c <- data_RAW %>%
   filter(Source == "FEMA_MSSLW_JUN_JUL_AUG_2020.xlsx",
          `END DATE` >= as.Date('2020-06-06'),
          `END DATE` < as.Date('2020-08-08'))
-data_RAW_d <- data_RAW %>% 
+data_RAW_d <- data_RAW %>%
   filter(Source == 'FEMA_MSSLW_JUL_AUG_SEP_2020.xlsx',
          `END DATE` >= as.Date('2020-08-08'),
          `END DATE` < as.Date('2020-08-29'))
-data_RAW_f <- data_RAW %>% 
+data_RAW_f <- data_RAW %>%
   filter(Source == 'FEMA_MSSLW_OCT20.xlsx',
          `END DATE` >= as.Date('2020-08-29'),
          `END DATE` < as.Date('2020-10-31'))
@@ -118,7 +118,7 @@ if(nrow(data_MSSL_MSW) != row_count){
   stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
 #If there is no Oracle format use the Legacy cost center
-data_test <- data_MSSL_MSW %>%
+data_MSSL_MSW <- data_MSSL_MSW %>%
   mutate(DPT.HOME = case_when(
     is.na(DPT.HOME) ~ DPT.HOME.Legacy,
     TRUE ~ DPT.HOME),
