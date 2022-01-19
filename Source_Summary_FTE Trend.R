@@ -49,7 +49,7 @@ Source_Summary <- function(data){
   System_Department <- read_xlsx("J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Mapping/MSHS_Reporting_Definition_Mapping.xlsx")
   System_Department <- System_Department %>%
     filter(FTE.TREND == 1) %>%
-    select(COST.CENTER, DEFINITION.CODE, DEFINITION.NAME, SERVICE.LINE, SITE)
+    select(ORACLE.COST.CENTER, DEFINITION.CODE, DEFINITION.NAME, SERVICE.LINE, SITE)
   row_count <- nrow(Site_Summary)
   Site_Summary <- left_join(Site_Summary,System_Department, by = c("DPT.WRKD" = "ORACLE.COST.CENTER")) %>%
     ungroup() %>%

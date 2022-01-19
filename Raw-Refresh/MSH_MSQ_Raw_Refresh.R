@@ -74,6 +74,7 @@ mshq <- rbind(msh, msq) %>%
 data_msh_msq <- mshq %>%
   filter(as.Date(END.DATE, format = "%m/%d/%Y") <=
            as.Date("03/21/2020", format = "%m/%d/%Y"))
+#save RDS
 saveRDS(data_msh_msq, file = paste0("J:/deans/Presidents/SixSigma/",
                                     "MSHS Productivity/Productivity/",
                                     "Universal Data/Labor/RDS/",

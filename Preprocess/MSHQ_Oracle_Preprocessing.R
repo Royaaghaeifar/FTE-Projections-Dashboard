@@ -2,19 +2,21 @@ library(dplyr)
 library(readxl)
 library(rstudioapi)
 
+memory.limit(size = 8000000)
+
 #universal directory
 universal_dir <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
                         "Productivity/Universal Data/")
 
 #Read in raw MSHQ Oracle raw refresh
 data_msh_msq_oracle <- readRDS(paste0(universal_dir,
-                                      "Labor/RDS/data_msh_msq_oracle.rds"))
+                                      "Labor/RDS/data_msh_msq_oracle_check.rds"))
 
 #Read COA for department location
 coa <- read.csv(paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
                        "Productivity/Analysis/FEMA Reimbursement/",
-                       "MSHS-FEMA-Reimbursement/Reference Tables/COA.csv",
-                header = T, stringsAsFactors = F, strip.white = TRUE))
+                       "MSHS-FEMA-Reimbursement/Reference Tables/COA.csv"),
+                header = T, stringsAsFactors = F, strip.white = TRUE)
 
 #Read in job code descriptions
 jc_desc <- read_xlsx(paste0(universal_dir,
@@ -72,7 +74,11 @@ if(nrow(oracle) != row_count) {
   }
 
 #Bring in standardized JC Description
+row_count <- nrow(oracle)
 oracle <- left_join(oracle, jc_desc, by = c("Job.Code" = "J.C"))
+if(nrow(oracle) != row_count) {
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))
+}
 
 #Format necessary columns
 oracle <- oracle %>%
