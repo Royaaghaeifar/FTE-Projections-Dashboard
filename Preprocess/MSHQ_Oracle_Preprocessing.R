@@ -10,7 +10,7 @@ universal_dir <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
 
 #Read in raw MSHQ Oracle raw refresh
 data_msh_msq_oracle <- readRDS(paste0(universal_dir,
-                                      "Labor/RDS/data_msh_msq_oracle_check.rds"))
+                                      "Labor/RDS/data_msh_msq_oracle.rds"))
 
 #Read COA for department location
 coa <- read.csv(paste0("J:/deans/Presidents/SixSigma/MSHS Productivity/",
