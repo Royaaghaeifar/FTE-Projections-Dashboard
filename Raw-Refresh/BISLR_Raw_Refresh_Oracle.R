@@ -35,7 +35,7 @@ sort_import_files <- function(dir_data){
   index <- sapply(name, function(x) unlist(str_split(x, pattern = "_"))[1])
   #Sorting files based on index number
   files <- data.table::data.table(name, path, index)
-  files <- files %>% arrange(index)
+  files <- files %>% mutate(index = as.numeric(index)) %>% arrange(index)
   #Importing data as list
   data_import <- lapply(as.list(files$path),
                         function(x) read.csv(x, as.is = T, strip.white = TRUE))
