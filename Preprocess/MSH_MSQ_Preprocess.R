@@ -26,11 +26,11 @@ if(nrow(data_MSH_MSQ) != row_count){
 #bring in department description and Location
 row_count <- nrow(data_MSH_MSQ)
 data_MSH_MSQ <- left_join(data_MSH_MSQ,COA,by = c("DPT.WRKD" = "Column2")) %>%
-  select(1:21)
+  select(1:22)
 if(nrow(data_MSH_MSQ) != row_count){
   stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
-colnames(data_MSH_MSQ)[20:21] <- c("LOCATION","DESCRIPTION")
+colnames(data_MSH_MSQ)[21:22] <- c("LOCATION","DESCRIPTION")
 
 #Correct negative hours and expenses
 negHours <- grep('-',data_MSH_MSQ$HOURS)
@@ -60,7 +60,7 @@ data_MSH_MSQ <- data_MSH_MSQ %>%
          HOME.SITE = rep(NA,nrow(data_MSH_MSQ)),
          HOME.LOCATION = rep(NA,nrow(data_MSH_MSQ)),
          HOME.DESCRIPTION = rep(NA,nrow(data_MSH_MSQ)))
-colnames(data_MSH_MSQ)[c(3,20,21)] <- c("DPT.HOME", "WRKD.LOCATION",
+colnames(data_MSH_MSQ)[c(3,21,22)] <- c("DPT.HOME", "WRKD.LOCATION",
                                         "WRKD.DESCRIPTION")
 
 rm(COA, JCdesc, negExpense, negHours, universal_dir)

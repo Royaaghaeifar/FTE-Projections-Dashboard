@@ -55,14 +55,6 @@ data_MSSL_MSW <- data_MSSL_MSW %>%
 data_MSSL_MSW <- data_MSSL_MSW %>%
   mutate(WRKD.LOCATION = `Location Description`, HOME.LOCATION = NA)
 
-# Cost Center ("Department") ---------------------------------------------
-data_MSSL_MSW$DPT.WRKD <- paste0(data_MSSL_MSW$WD_COFT,
-                                 data_MSSL_MSW$WD_Location,
-                                 data_MSSL_MSW$WD_Department)
-data_MSSL_MSW$DPT.HOME <- paste0(data_MSSL_MSW$HD_COFT,
-                                 data_MSSL_MSW$HD_Location,
-                                 data_MSSL_MSW$HD_Department)
-
 # Lookup Site -------------------------------------------------------------
 data_MSSL_MSW <- merge.data.frame(data_MSSL_MSW, dict_site,
                                   by.x = "Home FacilityOR Hospital ID",
