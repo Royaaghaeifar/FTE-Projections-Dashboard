@@ -4,31 +4,35 @@
 
 library(dplyr)
 library(readxl)
+library(rstudioapi)
 
-dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-dir_ref <- paste0(dir, "MSBIB Reference/")
+univ_ref <- paste0(
+  "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/",
+  "Universal Data/"
+)
 
-data_MSBI_MSB <- readRDS(paste0(dir, "Reference Tables/data_MSBI_MSB.rds"))
+data_MSBI_MSB <- readRDS(paste0(univ_ref, "Labor/RDS/data_MSBI_MSB.rds"))
 
 # Inputs/Imports ----------------------------------------------------------
 
 coft_desc <- read_excel(
-  paste0(dir_ref, "COFT Descriptions.xlsx"),
+  paste0(univ_ref, "Mapping/MSBIB_Legacy COFT Descriptions.xlsx"),
   sheet = "COFT_TABLE"
 )
 simp_loc <- read_excel(
-  paste0(dir_ref, "COFT Descriptions.xlsx"),
+  paste0(univ_ref, "Mapping/MSBIB_Legacy COFT Descriptions.xlsx"),
   sheet = "COFT_TABLE_SIMP"
 )
 loc_desc <- read_excel(
-  paste0(dir_ref, "COFT Descriptions.xlsx"),
+  paste0(univ_ref, "Mapping/MSBIB_Legacy COFT Descriptions.xlsx"),
   sheet = "LOC_TABLE"
 )
+
 jc_dict <- read_excel(
-  paste0(dir_ref, "MSBI Job Code Dictionary.xlsx")
+  paste0(univ_ref, "Mapping/MSHS_Jobcode_Mapping.xlsx")
 )
-jc_dict_MSLW <- read_excel(paste0(dir, "MSLW Reference Tables/MSLW Job Codes.xlsx"))
-jc_dict_MSLW <- jc_dict_MSLW %>% distinct()
+
+jc_dict <- distinct_at(jc_dict, vars(c(PAYROLL, J.C.DESCRIPTION)), .keep_all = TRUE)
 
 # Data Transformations ----------------------------------------------------
 
@@ -37,70 +41,106 @@ payroll_data_process <- data_MSBI_MSB
 payroll_data_process$HD_CO <- substr(payroll_data_process$HD_COFT, 1, 2)
 payroll_data_process$WD_CO <- substr(payroll_data_process$WD_COFT, 1, 2)
 
-payroll_data_process$DPT.WRKD <- paste0(
-  payroll_data_process$WD_COFT, payroll_data_process$WD_Location,
-  payroll_data_process$WD_Department
-)
-payroll_data_process$DPT.HOME <- paste0(
-  payroll_data_process$HD_COFT, payroll_data_process$HD_Location,
-  payroll_data_process$HD_Department
-)
+# payroll_data_process$DPT.WRKD <- paste0(
+#   payroll_data_process$WD_COFT, payroll_data_process$WD_Location,
+#   payroll_data_process$WD_Department
+# )
+# payroll_data_process$DPT.HOME <- paste0(
+#   payroll_data_process$HD_COFT, payroll_data_process$HD_Location,
+#   payroll_data_process$HD_Department
+# )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, coft_desc,
   by.x = "WD_COFT", by.y = "COFT",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     WRKD.COFT.DESC = COFT_Description
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, coft_desc,
   by.x = "HD_COFT", by.y = "COFT",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     HOME.COFT.DESC = COFT_Description
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, simp_loc,
   by.x = "WD_COFT", by.y = "COFT",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     WRKD.LOCATION = COFT_LOC_GROUP
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, simp_loc,
   by.x = "HD_COFT", by.y = "COFT",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     HOME.LOCATION = COFT_LOC_GROUP
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, loc_desc,
   by.x = "WD_Location", by.y = "Location",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     cc_wd_loc = LOC_Name
   )
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
   payroll_data_process, loc_desc,
   by.x = "HD_Location", by.y = "Location",
   all.x = T, all.y = F
 )
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
     cc_hd_loc = LOC_Name
@@ -111,22 +151,40 @@ payroll_data_process <- payroll_data_process %>%
     is.na(`Position Code Description`) ~ "OTHER",
     TRUE ~ `Position Code Description`))
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
 payroll_data_process <- merge(
-  payroll_data_process, select(jc_dict, "Job Description", "Job code"),
-  by.x = "Position Code Description", by.y = "Job Description",
+  payroll_data_process,
+  jc_dict %>%
+    filter(PAYROLL == "MSBIB") %>%
+    select("J.C.DESCRIPTION", "J.C"),
+  by.x = "Position Code Description", by.y = "J.C.DESCRIPTION",
   all.x = T, all.y = F
 )
-payroll_data_process <- merge(
-  payroll_data_process, select(jc_dict_MSLW, "Position Code Description", 'J.C'),
-  by.x = 'Position Code Description', by.y = 'Position Code Description',
-  all.x = T, all.y = F
-)
-payroll_data_process <- payroll_data_process %>%
-  mutate(`Job code` = case_when(
-    is.na(`Job code`) ~ J.C,
-    TRUE ~ `Job code`),
-    J.C = NULL)
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
 
+#Checking row count before join
+row_count <- nrow(payroll_data_process)
+payroll_data_process <- merge(
+  payroll_data_process,
+  jc_dict %>%
+    filter(PAYROLL == "MSMW") %>%
+    select("J.C.DESCRIPTION", "J.C"),
+  by.x = "Position Code Description", by.y = "J.C.DESCRIPTION",
+  all.x = T, all.y = F
+)
+#If rows added during left join stop executing code
+if(nrow(payroll_data_process) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
+
+payroll_data_process <- payroll_data_process %>%
+  mutate(J.C.x = case_when(
+    is.na(J.C.x) ~ J.C.y,
+    TRUE ~ J.C.x),
+    J.C.y = NULL)
 
 payroll_data_process <- payroll_data_process %>%
   dplyr::rename(
@@ -137,7 +195,7 @@ payroll_data_process <- payroll_data_process %>%
     END.DATE = "END DATE",
     HOURS = Hours,
     EXPENSE = Expense,
-    J.C = "Job code",
+    J.C = J.C.x,
     J.C.DESCRIPTION = "Position Code Description"
   )
 
@@ -154,4 +212,4 @@ data_MSBI_MSB <- payroll_data_process
 
 # Outputs/Exports ---------------------------------------------------------
 
-rm(coft_desc, jc_dict, loc_desc, payroll_data_process, simp_loc, dir_ref, jc_dict_MSLW)
+rm(coft_desc, jc_dict, loc_desc, payroll_data_process, simp_loc, dir_ref, dir, univ_ref)

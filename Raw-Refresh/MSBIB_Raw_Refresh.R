@@ -4,17 +4,23 @@
 
 library(dplyr)
 library(readxl) # needed for import
+library(here)
+library(rstudioapi)
 
 # home location for working directory folder
-dir <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Analysis/FEMA Reimbursement/MSHS-FEMA-Reimbursement/"
-
-dir_raw <- paste0(dir, "MSBIB Raw/")
+dir <- here()
+dir_raw <- paste0(dir, "/Raw Data/MSBIB Legacy/")
+dir_universal <- paste0("J:/deans/Presidents/SixSigma/MSHS Productivity",
+                        "/Productivity/Universal Data")
 
 # Inputs/Imports ----------------------------------------------------------
 
+dict_cc_conversion <- read_xlsx(paste0(dir_universal,
+                                       "/Mapping",
+                                       "/MSHS_Code_Conversion_Mapping.xlsx"))
 
 MSBIB_file_list <- list.files(path = dir_raw, pattern = "*.xlsx")
-MSBIB_file_list <- MSBIB_file_list[-grep("~", MSBIB_file_list, value = FALSE)]
+# MSBIB_file_list <- MSBIB_file_list[-grep("~", MSBIB_file_list, value = FALSE)]
 
 MSBIB_data_list <- lapply(
   MSBIB_file_list,
@@ -33,8 +39,18 @@ rownames(MSBIB_raw_data) <- c()
 # And because the position title shouldn't change such that an employee becomes
 # a provider, the sort order of rows isn't critical.
 
-MSBIB_raw_data <- MSBIB_raw_data %>% distinct_at(vars(-c(`Position Code Description`, `POSITION CODE`)), .keep_all = TRUE)
-
+# IMPORTANT
+# add all text based columns to ensure that changes to names don't affect de-duplication
+# this might be a concern for some ID numbers, but that should be rare
+MSBIB_raw_data <- MSBIB_raw_data %>%
+  distinct_at(vars(-c(`Position Code Description`,
+                      `POSITION CODE`,
+                      `Department Name Home Dept`,
+                      `Department Name Worked Dept`,
+                      `Location Description`,
+                      `Employee Name`)),
+              .keep_all = TRUE)
+#### *******************************************
 
 MSBIB_raw_data$PAYROLL <- "MSBI"
 MSBIB_raw_data$PAYROLL[MSBIB_raw_data$WD_COFT == "4709" & MSBIB_raw_data$WD_Location == "07"] <- "MSB"
@@ -56,7 +72,48 @@ MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4408" & MS
 MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4409" & MSBIB_raw_data$WD_Location == "03" & MSBIB_raw_data$WD_Department == "4268" & MSBIB_raw_data$`Employee Name` == "WALKER, THERESA L"] <- "DUS_REMOVE"
 MSBIB_raw_data$`Position Code Description`[MSBIB_raw_data$WD_COFT == "4409" & MSBIB_raw_data$WD_Location == "03" & MSBIB_raw_data$WD_Department == "4268" & MSBIB_raw_data$`Employee Name` == "WALKER, THERESA L (Lauren)"] <- "DUS_REMOVE"
 
-RDS_path <- paste0(dir, "Reference Tables/")
+
+dict_cc_conversion <- dict_cc_conversion %>%
+  filter(PAYROLL %in% c("MSBIB")) %>%
+  select(COST.CENTER.LEGACY, COST.CENTER.ORACLE) %>%
+  distinct()
+
+# Cost Center ("Department") ---------------------------------------------
+MSBIB_raw_data$DPT.WRKD.Legacy <- paste0(MSBIB_raw_data$WD_COFT,
+                                         MSBIB_raw_data$WD_Location,
+                                         MSBIB_raw_data$WD_Department)
+MSBIB_raw_data$DPT.HOME.Legacy <- paste0(MSBIB_raw_data$HD_COFT,
+                                         MSBIB_raw_data$HD_Location,
+                                         MSBIB_raw_data$HD_Department)
+
+# Add Oracle Cost Centers -------------------------------------------------
+row_count <- nrow(MSBIB_raw_data)
+#Looking up oracle conversion for legacy home cost center
+MSBIB_raw_data <- left_join(MSBIB_raw_data, dict_cc_conversion,
+                           by = c("DPT.HOME.Legacy" = "COST.CENTER.LEGACY"))
+
+#Looking up oracle conversion for legacy worked cost center
+MSBIB_raw_data <- left_join(MSBIB_raw_data, dict_cc_conversion,
+                           by = c("DPT.WRKD.Legacy" = "COST.CENTER.LEGACY"))
+
+#Renaming columns
+MSBIB_raw_data <- MSBIB_raw_data %>%
+  rename(DPT.HOME = COST.CENTER.ORACLE.x,
+         DPT.WRKD = COST.CENTER.ORACLE.y)
+
+if(nrow(MSBIB_raw_data) != row_count){
+  stop(paste("Row count failed at", basename(getSourceEditorContext()$path)))}
+
+MSBIB_raw_data <- MSBIB_raw_data %>%
+  mutate(DPT.HOME = case_when(
+    is.na(DPT.HOME) ~ DPT.HOME.Legacy,
+    TRUE ~ DPT.HOME),
+    DPT.WRKD = case_when(
+      is.na(DPT.WRKD) ~ DPT.WRKD.Legacy,
+      TRUE ~ DPT.WRKD))
+
+RDS_path <- "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/"
+
 saveRDS(MSBIB_raw_data, file = paste0(RDS_path, "data_MSBI_MSB.rds"))
 
-rm(dir_raw, MSBIB_file_list, MSBIB_data_list, MSBIB_raw_data, RDS_path)
+rm(dir, dir_raw, MSBIB_file_list, MSBIB_data_list, MSBIB_raw_data, RDS_path)
