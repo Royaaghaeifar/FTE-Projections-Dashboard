@@ -2,6 +2,8 @@ library(dplyr)
 library(tidyr)
 library(here)
 
+memory.limit(size = 8000000)
+
 ##MSHQ##
 #PP end dates for filtering each raw file
 PPend_list <- list("04/25/2020","05/23/2020","06/20/2020","08/01/2020",
@@ -65,4 +67,4 @@ check <- Oracle %>%
   arrange(End.Date) 
 check1 <- pivot_wider(check,id_cols = PAYROLL,values_from = Hours,names_from = End.Date)
 #Save .rds
-saveRDS(Oracle,file = "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/data_MSH_MSQ_oracle.rds")
+saveRDS(Oracle,file = "J:/deans/Presidents/SixSigma/MSHS Productivity/Productivity/Universal Data/Labor/RDS/data_MSH_MSQ_oracle_check.rds")

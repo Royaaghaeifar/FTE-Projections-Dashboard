@@ -41,14 +41,14 @@ payroll_data_process <- data_MSBI_MSB
 payroll_data_process$HD_CO <- substr(payroll_data_process$HD_COFT, 1, 2)
 payroll_data_process$WD_CO <- substr(payroll_data_process$WD_COFT, 1, 2)
 
-payroll_data_process$DPT.WRKD <- paste0(
-  payroll_data_process$WD_COFT, payroll_data_process$WD_Location,
-  payroll_data_process$WD_Department
-)
-payroll_data_process$DPT.HOME <- paste0(
-  payroll_data_process$HD_COFT, payroll_data_process$HD_Location,
-  payroll_data_process$HD_Department
-)
+# payroll_data_process$DPT.WRKD <- paste0(
+#   payroll_data_process$WD_COFT, payroll_data_process$WD_Location,
+#   payroll_data_process$WD_Department
+# )
+# payroll_data_process$DPT.HOME <- paste0(
+#   payroll_data_process$HD_COFT, payroll_data_process$HD_Location,
+#   payroll_data_process$HD_Department
+# )
 
 #Checking row count before join
 row_count <- nrow(payroll_data_process)
