@@ -11,6 +11,7 @@ filter_start_dates <- c("2021-02-28", "2021-03-28", "2021-04-25", "2021-05-23",
 filter_end_dates <- c("2021-04-03", "2021-05-01", "2021-05-29", "2021-06-26",
                       "2021-08-07","2021-09-04", "2021-10-02",  "2021-10-30",
                       "2021-11-27", "2022-01-08")
+
 #Premier Distribution ex: 2/28/21- 3/27/21, 3/28/21 - 4/24/21
 # First weekly cycle for each BISLR Oracle file (ex. 3/28 - 4/3) is deleted
 # using delete_weekly() custom function (see function below)
