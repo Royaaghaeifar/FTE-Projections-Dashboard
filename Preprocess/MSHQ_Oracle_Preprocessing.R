@@ -86,7 +86,7 @@ oracle <- oracle %>%
          Hours = as.numeric(Hours),
          Expense = as.numeric(Expense))
 #Column names
-new_col_names <- c("DPT.WRKD", "DPT.HOME", "START.DATE", "END.DATE", "J.C",
+new_col_names <- c("DPT.HOME", "DPT.WRKD", "START.DATE", "END.DATE", "J.C",
                    "PAY.CODE", "HOME.DESCRIPTION", "WRKD.DESCRIPTION", "HOURS",
                    "EXPENSE", "WRKD.LOCATION", "HOME.LOCATION",
                    "J.C.DESCRIPTION")
